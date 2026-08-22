@@ -5,6 +5,11 @@ export interface QuickFact {
   value: string;
 }
 
+export interface SocialLink {
+  platform: string;
+  url: string;
+}
+
 export interface ProfileDocument {
   id?: string;
   name: string;
@@ -19,6 +24,11 @@ export interface ProfileDocument {
   focus?: string;
   githubUsername?: string;
   codeforcesHandle?: string;
+  phone?: string;
+  linkedinUrl?: string;
+  twitterUrl?: string;
+  contactMessage?: string;
+  socialLinks?: SocialLink[];
   quickFacts: QuickFact[];
   updatedAt?: Timestamp | Date | string;
 }
@@ -45,6 +55,31 @@ export interface ExperienceDocument {
   techStack: string[];
   order: number;
   createdAt?: Timestamp | Date | string;
+}
+
+export interface EducationDocument {
+  id?: string;
+  institution: string;
+  degree: string;
+  fieldOfStudy: string;
+  duration: string; // e.g. "2022 - 2026"
+  location: string;
+  gpa?: string;
+  description?: string;
+  order: number;
+  createdAt?: Timestamp | Date | string;
+  updatedAt?: Timestamp | Date | string;
+}
+
+export interface PositionDocument {
+  id?: string;
+  title: string;
+  organization: string;
+  duration: string; // e.g. "Aug 2024 - Present"
+  description: string;
+  order: number;
+  createdAt?: Timestamp | Date | string;
+  updatedAt?: Timestamp | Date | string;
 }
 
 export type SkillCategory =

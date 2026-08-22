@@ -5,14 +5,19 @@ import { Hero } from "@/components/hero";
 import { AboutSection } from "@/components/about-section";
 import { SkillsSection } from "@/components/skills-section";
 import { ExperienceSection } from "@/components/experience-section";
+import { EducationSection } from "@/components/education-section";
 import { ProjectsSection } from "@/components/projects-section";
+import { PositionsSection } from "@/components/positions-section";
 import { ActivitySection } from "@/components/activity-section";
+import { ContactSection } from "@/components/contact-section";
 import {
   getProfileServer,
   getCareerLogsServer,
   getExperiencesServer,
   getSkillsServer,
   getProjectsServer,
+  getEducationServer,
+  getPositionsServer,
 } from "@/lib/server-data";
 import { fetchGitHubStats } from "@/lib/github";
 import { fetchCodeforcesStats } from "@/lib/codeforces";
@@ -23,12 +28,22 @@ export const revalidate = 0;
 
 export default async function HomePage() {
   // Fetch all live Firestore collections in parallel on the server
-  const [profile, careerLogs, experiences, skills, projects] = await Promise.all([
+  const [
+    profile,
+    careerLogs,
+    experiences,
+    skills,
+    projects,
+    educationList,
+    positionsList,
+  ] = await Promise.all([
     getProfileServer(),
     getCareerLogsServer(),
     getExperiencesServer(),
     getSkillsServer(),
     getProjectsServer(),
+    getEducationServer(),
+    getPositionsServer(),
   ]);
 
   // Fetch external platform statistics in parallel if handles are configured
@@ -47,24 +62,30 @@ export default async function HomePage() {
 
       {/* Main Content */}
       <main className="flex-grow flex flex-col space-y-4">
-        {/* Hero Section */}
+        {/* 1. Hero Section */}
         <section id="hero">
           <Hero initialProfile={profile} />
         </section>
 
-        {/* About Section */}
+        {/* 2. About & Career Timeline Section */}
         <AboutSection initialProfile={profile} initialCareerLogs={careerLogs} />
 
-        {/* Skills Section */}
+        {/* 3. Skills Section */}
         <SkillsSection initialSkills={skills} />
 
-        {/* Experience Section */}
+        {/* 4. Professional Experience Section */}
         <ExperienceSection initialExperiences={experiences} />
 
-        {/* Projects Section */}
+        {/* 5. Academic Background & Education Section */}
+        <EducationSection initialEducation={educationList} />
+
+        {/* 6. Featured Projects & Systems Section */}
         <ProjectsSection initialProjects={projects} />
 
-        {/* Activity Section (GitHub + Codeforces Stats) */}
+        {/* 7. Positions of Responsibility & Leadership Section */}
+        <PositionsSection initialPositions={positionsList} />
+
+        {/* 8. Coding Activity & Stats Section (GitHub + Codeforces) */}
         <ActivitySection
           githubStats={githubStats}
           githubUsername={profile.githubUsername}
@@ -72,12 +93,8 @@ export default async function HomePage() {
           codeforcesHandle={profile.codeforcesHandle}
         />
 
-        {/* Placeholder anchor targets for future Phase 5+ sections */}
-        <div className="sr-only">
-          <div id="education" />
-          <div id="positions" />
-          <div id="contact" />
-        </div>
+        {/* 9. Contact & Social Channels Section */}
+        <ContactSection profile={profile} />
       </main>
 
       {/* Minimalistic Terminal Footer */}

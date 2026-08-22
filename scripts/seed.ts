@@ -50,27 +50,38 @@ async function seed() {
   // 1. Seed Profile (`profile/main`)
   console.log("📝 Seeding Profile document (profile/main)...");
   await db.doc("profile/main").set({
-    name: "Alex Developer",
+    name: "Saurav Kumar",
     tagline: "Full-Stack Engineer & Distributed Systems Specialist",
-    location: "San Francisco, CA / Remote",
-    bio: "Specializing in TypeScript, high-performance web frontends, distributed backends, and cloud architectures. Passionate about developer tooling, clean interface design, and resilient backend services.",
-    email: "alex.developer@example.com",
-    degree: "B.S. in Computer Science",
-    year: "Class of 2025",
-    focus: "Distributed Systems & Web Performance",
-    githubUsername: "torvalds",
-    codeforcesHandle: "tourist",
+    location: "Roorkee, India / Remote",
+    bio: "Specializing in TypeScript, high-performance web frontends, distributed backends, and cloud architectures. Passionate about developer tooling, clean interface design, and competitive programming.",
+    email: "saurav_k@ece.iitr.ac.in",
+    degree: "B.Tech in Electronics and Communication Engineering",
+    year: "Class of 2026",
+    focus: "Distributed Systems, Web Performance & Competitive Programming",
+    githubUsername: "I-M-Saurav",
+    codeforcesHandle: "Knight_master",
+    phone: "+91 98765 43210",
+    linkedinUrl: "https://linkedin.com/in/saurav-kumar",
+    twitterUrl: "https://twitter.com",
+    contactMessage: "Open to software engineering roles, distributed systems projects, and high-impact teams. Let's connect!",
+    socialLinks: [
+      { platform: "GitHub", url: "https://github.com/I-M-Saurav" },
+      { platform: "LinkedIn", url: "https://linkedin.com/in/saurav-kumar" },
+      { platform: "Codeforces", url: "https://codeforces.com/profile/Knight_master" },
+      { platform: "Twitter", url: "https://twitter.com" },
+    ],
     resumeUrl: "https://example.com/resume.pdf",
     quickFacts: [
-      { key: "degree", value: "B.S. in Computer Science" },
-      { key: "year", value: "Class of 2025" },
-      { key: "focus", value: "Distributed Systems & Modern Web" },
-      { key: "interests", value: "Cloud Infrastructure, Compilers, UI Engineering" },
+      { key: "institution", value: "Indian Institute of Technology (IIT) Roorkee" },
+      { key: "degree", value: "B.Tech in ECE" },
+      { key: "year", value: "Class of 2026" },
+      { key: "focus", value: "Distributed Systems & Full-Stack" },
+      { key: "interests", value: "Cloud Infrastructure, Competitive Programming, UI Engineering" },
     ],
     updatedAt: new Date().toISOString(),
   });
 
-  // 2. Seed 2 Realistic Experience items
+  // 2. Seed Experience items
   console.log("💼 Seeding Experience items...");
   const experiences = [
     {
@@ -121,24 +132,24 @@ async function seed() {
     {
       date: "Jan 2026",
       type: "achievement",
-      title: "Winner @ Global Open Source Hackathon",
-      description: "Built an AI-assisted terminal developer copilot with 1.2k+ GitHub stars.",
+      title: "Specialist Rating @ Codeforces",
+      description: "Achieved max rating of 1647 in competitive programming contest rounds.",
       order: 2,
       createdAt: new Date().toISOString(),
     },
     {
       date: "Aug 2025",
       type: "milestone",
-      title: "Lead Frontend Architect @ TechClub University",
-      description: "Spearheaded portal revamp serving 15,000+ active students.",
+      title: "Lead Technical Coordinator @ IIT Roorkee Society",
+      description: "Spearheaded university developer portal revamp serving 10,000+ active students.",
       order: 3,
       createdAt: new Date().toISOString(),
     },
     {
-      date: "Sep 2023",
+      date: "Sep 2022",
       type: "education",
-      title: "Enrolled in B.S. Computer Science",
-      description: "Specialization in Systems and Algorithms. Dean's Honors List.",
+      title: "Enrolled in B.Tech @ IIT Roorkee",
+      description: "Department of Electronics and Communication Engineering.",
       order: 4,
       createdAt: new Date().toISOString(),
     },
@@ -155,7 +166,8 @@ async function seed() {
     { name: "JavaScript", category: "Languages", proficiency: 95, order: 2 },
     { name: "Python", category: "Languages", proficiency: 85, order: 3 },
     { name: "Go (Golang)", category: "Languages", proficiency: 75, order: 4 },
-    { name: "SQL", category: "Languages", proficiency: 88, order: 5 },
+    { name: "C++", category: "Languages", proficiency: 88, order: 5 },
+    { name: "SQL", category: "Languages", proficiency: 88, order: 6 },
 
     { name: "React / Next.js", category: "Frontend", proficiency: 95, order: 1 },
     { name: "Tailwind CSS", category: "Frontend", proficiency: 95, order: 2 },
@@ -180,7 +192,58 @@ async function seed() {
     await db.collection("skills").add(skill);
   }
 
-  // 5. Seed Projects
+  // 5. Seed Education
+  console.log("🎓 Seeding Education History...");
+  const education = [
+    {
+      institution: "Indian Institute of Technology (IIT) Roorkee",
+      degree: "Bachelor of Technology (B.Tech)",
+      fieldOfStudy: "Electronics and Communication Engineering",
+      duration: "2022 - 2026",
+      location: "Roorkee, Uttarakhand, India",
+      gpa: "8.5 / 10.0",
+      description:
+        "Relevant Coursework: Data Structures & Algorithms, Operating Systems, Database Management Systems, Computer Networks, Object-Oriented Programming, Digital Signal Processing, Computer Architecture.",
+      order: 1,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+  ];
+
+  for (const edu of education) {
+    await db.collection("education").add(edu);
+  }
+
+  // 6. Seed Positions of Responsibility
+  console.log("🛡️ Seeding Positions of Responsibility...");
+  const positions = [
+    {
+      title: "Lead Technical Coordinator",
+      organization: "Software Development Section (SDS), IIT Roorkee",
+      duration: "Aug 2024 - Present",
+      description:
+        "Lead a team of 20+ student engineers developing internal campus web applications, developer infrastructure, and annual hackathon platforms with 5,000+ participants.",
+      order: 1,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+    {
+      title: "Executive Member",
+      organization: "Programming Club (P-Club), IIT Roorkee",
+      duration: "Aug 2023 - May 2024",
+      description:
+        "Mentored junior undergraduates in competitive programming algorithms, conducted weekly algorithmic problem sessions, and co-organized national collegiate coding contests.",
+      order: 2,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+  ];
+
+  for (const pos of positions) {
+    await db.collection("positions").add(pos);
+  }
+
+  // 7. Seed Projects
   console.log("🚀 Seeding Projects Catalog...");
   const projects = [
     {

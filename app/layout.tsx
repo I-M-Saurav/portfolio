@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ToastProvider } from "@/components/ui/toast";
+import { getProfileServer } from "@/lib/server-data";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -16,10 +17,42 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: "Alex Developer | Software Engineer Portfolio",
-  description: "Personal portfolio and technical showcase of Alex Developer — Software Engineer specializing in modern web, cloud, and distributed systems.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const profile = await getProfileServer();
+
+  const title = `${profile.name} | Software Engineer`;
+  const description = profile.bio || "Personal portfolio and technical showcase of Saurav Kumar — Software Engineer.";
+
+  return {
+    title,
+    description,
+    keywords: [
+      profile.name,
+      "Software Engineer",
+      "Full-Stack Developer",
+      "Distributed Systems",
+      "TypeScript",
+      "Next.js",
+      "Competitive Programming",
+      "Portfolio",
+    ],
+    authors: [{ name: profile.name, url: `https://github.com/${profile.githubUsername || "I-M-Saurav"}` }],
+    creator: profile.name,
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      locale: "en_US",
+      siteName: `${profile.name} Portfolio`,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      creator: profile.twitterUrl ? `@${profile.twitterUrl.split("/").pop()}` : undefined,
+    },
+  };
+}
 
 export default function RootLayout({
   children,

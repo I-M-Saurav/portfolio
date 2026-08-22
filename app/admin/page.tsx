@@ -9,12 +9,14 @@ import {
   GitCommit,
   Briefcase,
   Cpu,
+  GraduationCap,
+  FolderGit2,
+  ShieldCheck,
+  Mail,
   LogOut,
   Terminal,
   ArrowLeft,
   Loader2,
-  ShieldCheck,
-  FolderGit2,
 } from "lucide-react";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -22,10 +24,21 @@ import { ProfileManager } from "@/components/admin/profile-manager";
 import { CareerManager } from "@/components/admin/career-manager";
 import { ExperienceManager } from "@/components/admin/experience-manager";
 import { SkillsManager } from "@/components/admin/skills-manager";
+import { EducationManager } from "@/components/admin/education-manager";
 import { ProjectsManager } from "@/components/admin/projects-manager";
+import { PositionsManager } from "@/components/admin/positions-manager";
+import { ContactManager } from "@/components/admin/contact-manager";
 import { motion, AnimatePresence } from "framer-motion";
 
-type AdminTab = "profile" | "career" | "experience" | "skills" | "projects";
+type AdminTab =
+  | "profile"
+  | "career"
+  | "experience"
+  | "skills"
+  | "education"
+  | "projects"
+  | "positions"
+  | "contact";
 
 export default function AdminDashboardPage() {
   const router = useRouter();
@@ -51,7 +64,10 @@ export default function AdminDashboardPage() {
     { id: "career", label: "Career Log", icon: GitCommit },
     { id: "experience", label: "Experience", icon: Briefcase },
     { id: "skills", label: "Skills", icon: Cpu },
+    { id: "education", label: "Education", icon: GraduationCap },
     { id: "projects", label: "Projects", icon: FolderGit2 },
+    { id: "positions", label: "Positions", icon: ShieldCheck },
+    { id: "contact", label: "Contact & Socials", icon: Mail },
   ];
 
   return (
@@ -136,7 +152,10 @@ export default function AdminDashboardPage() {
               {activeTab === "career" && <CareerManager />}
               {activeTab === "experience" && <ExperienceManager />}
               {activeTab === "skills" && <SkillsManager />}
+              {activeTab === "education" && <EducationManager />}
               {activeTab === "projects" && <ProjectsManager />}
+              {activeTab === "positions" && <PositionsManager />}
+              {activeTab === "contact" && <ContactManager />}
             </motion.div>
           </AnimatePresence>
         </div>

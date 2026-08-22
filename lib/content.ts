@@ -25,16 +25,17 @@ export interface SiteContent {
 }
 
 export const siteContent: SiteContent = {
-  navLogo: "main@portfolio",
-  terminalPromptUser: "visitor@portfolio:~$",
-  name: "Alex Developer",
-  identity: "Full-Stack Engineer & Systems Enthusiast building scalable web applications.",
-  bio: "Specializing in TypeScript, distributed systems, high-performance web frontends, and cloud architectures. Passionate about developer tooling, clean interface design, and resilient backend services.",
+  navLogo: "saurav@portfolio",
+  terminalPromptUser: "visitor@saurav:~$",
+  name: "Saurav Kumar",
+  identity: "Full-Stack Engineer & Distributed Systems Specialist building resilient, high-performance web applications.",
+  bio: "Specializing in TypeScript, distributed systems, high-performance web frontends, and cloud architectures. Passionate about developer tooling, clean interface design, and competitive programming.",
   status: "[ status: active — open to SDE roles ]",
   coreTechnologies: [
     "TypeScript",
     "React / Next.js",
     "Node.js",
+    "Go (Golang)",
     "PostgreSQL",
     "Firebase",
     "Tailwind CSS",

@@ -55,12 +55,12 @@ export function Navbar() {
         </Link>
 
         {/* Center / Right: Desktop Navigation links */}
-        <nav className="hidden lg:flex items-center gap-8 text-sm font-mono text-zinc-600 dark:text-zinc-400">
+        <nav className="hidden lg:flex items-center gap-4 xl:gap-6 text-xs xl:text-sm font-mono text-zinc-600 dark:text-zinc-400">
           {siteContent.navLinks.map((link) => (
             <a
               key={link.name}
               href={link.href}
-              className="transition-colors hover:text-emerald-600 dark:hover:text-emerald-400 py-1"
+              className="transition-colors hover:text-emerald-600 dark:hover:text-emerald-400 py-1 font-medium"
             >
               {link.name}
             </a>
