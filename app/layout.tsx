@@ -20,28 +20,51 @@ const jetbrainsMono = JetBrains_Mono({
 export async function generateMetadata(): Promise<Metadata> {
   const profile = await getProfileServer();
 
-  const title = `${profile.name} | Software Engineer`;
-  const description = profile.bio || "Personal portfolio and technical showcase of Saurav Kumar — Software Engineer.";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://portfolio-imsaurav.vercel.app";
+  const title = `${profile.name} — ${profile.tagline || "Software Engineer"}`;
+  const description =
+    profile.bio ||
+    `Personal portfolio and engineering showcase of ${profile.name} — Software Engineer specializing in Distributed Systems, Modern Web, and Performance.`;
 
   return {
-    title,
+    metadataBase: new URL(siteUrl),
+    title: {
+      default: title,
+      template: `%s | ${profile.name}`,
+    },
     description,
     keywords: [
       profile.name,
       "Software Engineer",
+      "SDE",
       "Full-Stack Developer",
       "Distributed Systems",
       "TypeScript",
       "Next.js",
+      "React",
       "Competitive Programming",
       "Portfolio",
+      profile.degree || "Computer Science",
+      profile.location || "Remote",
     ],
-    authors: [{ name: profile.name, url: `https://github.com/${profile.githubUsername || "I-M-Saurav"}` }],
+    authors: [
+      {
+        name: profile.name,
+        url: `https://github.com/${profile.githubUsername || "I-M-Saurav"}`,
+      },
+    ],
     creator: profile.name,
+    publisher: profile.name,
+    formatDetection: {
+      email: false,
+      address: false,
+      telephone: false,
+    },
     openGraph: {
       title,
       description,
       type: "website",
+      url: "/",
       locale: "en_US",
       siteName: `${profile.name} Portfolio`,
     },
@@ -50,6 +73,25 @@ export async function generateMetadata(): Promise<Metadata> {
       title,
       description,
       creator: profile.twitterUrl ? `@${profile.twitterUrl.split("/").pop()}` : undefined,
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
+    },
+    icons: {
+      icon: [
+        { url: "/icon.svg", type: "image/svg+xml" },
+      ],
+      apple: [
+        { url: "/apple-icon.svg", type: "image/svg+xml" },
+      ],
     },
   };
 }
