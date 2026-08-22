@@ -87,6 +87,21 @@ function generateCommitHash(seed: string, index: number): string {
   return hash;
 }
 
+// Helper to request high-res, auto-formatted, face-centered images from Cloudinary
+function getOptimizedCloudinaryUrl(url?: string, width = 800, height = 800): string {
+  if (!url) return "";
+  if (url.includes("res.cloudinary.com") && url.includes("/image/upload/")) {
+    if (url.includes("/image/upload/c_") || url.includes("/image/upload/w_") || url.includes("/image/upload/q_")) {
+      return url;
+    }
+    return url.replace(
+      "/image/upload/",
+      `/image/upload/c_fill,g_auto,w_${width},h_${height},q_auto:best,f_auto/`
+    );
+  }
+  return url;
+}
+
 interface AboutSectionProps {
   initialProfile?: ProfileDocument;
   initialCareerLogs?: CareerLogDocument[];
@@ -174,6 +189,8 @@ export function AboutSection({ initialProfile, initialCareerLogs }: AboutSection
     }
   };
 
+  const optimizedPhotoUrl = getOptimizedCloudinaryUrl(profile.photoUrl, 800, 800);
+
   return (
     <section id="about" className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-12 sm:py-16 md:py-20 lg:py-24">
       {/* Section Header */}
@@ -185,23 +202,27 @@ export function AboutSection({ initialProfile, initialCareerLogs }: AboutSection
         <div className="h-[1px] bg-black/10 dark:bg-white/10 flex-grow ml-4 max-w-md hidden sm:block" />
       </div>
 
-      {/* Terminal Window Card */}
+      {/* Terminal Window Card Container */}
       <div className="w-full rounded-xl border border-black/10 dark:border-white/10 bg-white/70 dark:bg-[#111116]/80 shadow-2xl backdrop-blur-md overflow-hidden">
-        {/* Top Window Bar + Tabs */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-zinc-200/70 dark:bg-zinc-900/90 border-b border-black/10 dark:border-white/10 px-3 sm:px-4 pt-2.5 sm:pt-3 sm:pb-0 gap-2">
-          {/* Decorative Window Controls & Label */}
-          <div className="flex items-center gap-1.5 sm:gap-2 pb-1 sm:pb-3">
+        {/* Terminal Top Window Bar */}
+        <div className="flex items-center justify-between px-3 sm:px-4 py-2.5 sm:py-3 bg-zinc-200/70 dark:bg-zinc-900/90 border-b border-black/10 dark:border-white/10 font-mono text-xs text-zinc-500 dark:text-zinc-400">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <span className="w-2.5 sm:w-3 h-2.5 sm:h-3 rounded-full bg-[#ff5f56] inline-block shadow-sm" />
             <span className="w-2.5 sm:w-3 h-2.5 sm:h-3 rounded-full bg-[#ffbd2e] inline-block shadow-sm" />
             <span className="w-2.5 sm:w-3 h-2.5 sm:h-3 rounded-full bg-[#27c93f] inline-block shadow-sm" />
-            <span className="ml-2 sm:ml-3 font-mono text-[11px] sm:text-xs text-zinc-600 dark:text-zinc-400 flex items-center gap-1.5">
+            <div className="ml-2 sm:ml-3 flex items-center gap-1.5 text-zinc-600 dark:text-zinc-400">
               <Terminal className="w-3.5 h-3.5 text-emerald-500" />
-              <span>profile_viewer</span>
-            </span>
+              <span className="text-[11px] sm:text-xs">whoami --verbose</span>
+            </div>
           </div>
+          <div className="text-zinc-600 dark:text-zinc-400 font-mono text-[10px] sm:text-[11px]">
+            bash &bull; active
+          </div>
+        </div>
 
-          {/* Clickable Code Editor Tabs */}
-          <div className="flex items-center gap-1 sm:self-end">
+        {/* Tab Navigation Buttons Bar */}
+        <div className="flex items-center justify-between px-4 sm:px-6 pt-3 border-b border-black/10 dark:border-white/10 bg-zinc-100/50 dark:bg-zinc-900/50">
+          <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => setActiveTab("about.md")}
@@ -243,48 +264,49 @@ export function AboutSection({ initialProfile, initialCareerLogs }: AboutSection
                 className="space-y-6 sm:space-y-8"
               >
                 {/* Profile Top Row: Photo + Bio & Metadata */}
-                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-7 md:gap-9">
-                  {/* Photo / Avatar Frame (Larger & More Prominent) */}
-                  <div className="relative group shrink-0 self-center sm:self-start">
-                    <div className="w-32 h-32 sm:w-44 sm:h-44 md:w-48 md:h-48 lg:w-52 lg:h-52 aspect-square rounded-2xl border-2 border-emerald-500/30 dark:border-emerald-400/30 ring-4 ring-black/5 dark:ring-white/5 overflow-hidden bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center shadow-xl transition-transform duration-300 group-hover:scale-[1.02]">
-                      {profile.photoUrl ? (
+                <div className="flex flex-col md:flex-row items-center md:items-start gap-6 sm:gap-8 md:gap-10">
+                  {/* Photo / Avatar Frame (Larger 240-260px on Desktop, High-DPI optimized) */}
+                  <div className="relative group shrink-0 self-center md:self-start">
+                    <div className="w-48 h-48 sm:w-56 sm:h-56 md:w-60 md:h-60 lg:w-64 lg:h-64 aspect-square rounded-2xl border-2 border-emerald-500/40 dark:border-emerald-400/40 ring-4 ring-emerald-500/10 dark:ring-emerald-400/10 overflow-hidden bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center shadow-2xl transition-transform duration-300 group-hover:scale-[1.02]">
+                      {optimizedPhotoUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
-                          src={profile.photoUrl}
+                          src={optimizedPhotoUrl}
                           alt={profile.name}
                           className="w-full h-full object-cover object-center"
+                          loading="eager"
                         />
                       ) : (
                         <div className="flex flex-col items-center justify-center text-zinc-400">
-                          <User className="w-12 sm:w-16 h-12 sm:h-16 text-zinc-400 dark:text-zinc-600" />
+                          <User className="w-16 sm:w-20 h-16 sm:h-20 text-zinc-400 dark:text-zinc-600" />
                           <span className="font-mono text-[10px] sm:text-xs mt-1 text-zinc-500">no_photo.png</span>
                         </div>
                       )}
                     </div>
-                    <div className="absolute -bottom-2 -right-2 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-mono font-bold bg-emerald-600 text-white shadow-md border border-emerald-400/40 tracking-wider">
+                    <div className="absolute -bottom-2.5 -right-2.5 px-3 py-1 rounded-md text-[11px] sm:text-xs font-mono font-bold bg-emerald-600 text-white shadow-xl border-2 border-white/20 dark:border-black/40 tracking-wider">
                       DEV
                     </div>
                   </div>
 
                   {/* Header info & Bio */}
-                  <div className="space-y-3 sm:space-y-3.5 flex-grow min-w-0 text-center sm:text-left">
+                  <div className="space-y-3 sm:space-y-4 flex-grow min-w-0 text-center md:text-left">
                     <div>
                       <h3 className="text-xl sm:text-2xl md:text-3xl font-bold font-mono text-zinc-900 dark:text-white break-words tracking-tight">
                         {profile.name}
                       </h3>
-                      <p className="text-xs sm:text-sm md:text-base font-mono text-emerald-600 dark:text-emerald-400 mt-1 break-words font-medium">
+                      <p className="text-xs sm:text-sm md:text-base font-mono text-emerald-600 dark:text-emerald-400 mt-1 break-words font-semibold">
                         {profile.tagline}
                       </p>
                     </div>
 
                     {profile.location && (
-                      <div className="flex items-center justify-center sm:justify-start gap-1.5 text-xs font-mono text-zinc-500 dark:text-zinc-400">
+                      <div className="flex items-center justify-center md:justify-start gap-1.5 text-xs font-mono text-zinc-500 dark:text-zinc-400">
                         <MapPin className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                         <span className="break-words">{profile.location}</span>
                       </div>
                     )}
 
-                    <p className="text-xs sm:text-sm md:text-[14.5px] font-sans text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1">
+                    <p className="text-xs sm:text-sm md:text-[15px] font-sans text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1">
                       {profile.bio}
                     </p>
                   </div>
