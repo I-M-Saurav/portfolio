@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { doc, getDoc, collection, getDocs, query, orderBy } from "firebase/firestore";
+import { doc, collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { getFirebaseDb } from "@/lib/firebase/client";
 import { ProfileDocument, CareerLogDocument, CareerLogType } from "@/types/firestore";
 import { siteContent } from "@/lib/content";
