@@ -14,6 +14,7 @@ import {
   ArrowLeft,
   Loader2,
   ShieldCheck,
+  FolderGit2,
 } from "lucide-react";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -21,9 +22,10 @@ import { ProfileManager } from "@/components/admin/profile-manager";
 import { CareerManager } from "@/components/admin/career-manager";
 import { ExperienceManager } from "@/components/admin/experience-manager";
 import { SkillsManager } from "@/components/admin/skills-manager";
+import { ProjectsManager } from "@/components/admin/projects-manager";
 import { motion, AnimatePresence } from "framer-motion";
 
-type AdminTab = "profile" | "career" | "experience" | "skills";
+type AdminTab = "profile" | "career" | "experience" | "skills" | "projects";
 
 export default function AdminDashboardPage() {
   const router = useRouter();
@@ -49,6 +51,7 @@ export default function AdminDashboardPage() {
     { id: "career", label: "Career Log", icon: GitCommit },
     { id: "experience", label: "Experience", icon: Briefcase },
     { id: "skills", label: "Skills", icon: Cpu },
+    { id: "projects", label: "Projects", icon: FolderGit2 },
   ];
 
   return (
@@ -133,6 +136,7 @@ export default function AdminDashboardPage() {
               {activeTab === "career" && <CareerManager />}
               {activeTab === "experience" && <ExperienceManager />}
               {activeTab === "skills" && <SkillsManager />}
+              {activeTab === "projects" && <ProjectsManager />}
             </motion.div>
           </AnimatePresence>
         </div>

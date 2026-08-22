@@ -5,12 +5,14 @@ import { Hero } from "@/components/hero";
 import { AboutSection } from "@/components/about-section";
 import { SkillsSection } from "@/components/skills-section";
 import { ExperienceSection } from "@/components/experience-section";
+import { ProjectsSection } from "@/components/projects-section";
 import { ActivitySection } from "@/components/activity-section";
 import {
   getProfileServer,
   getCareerLogsServer,
   getExperiencesServer,
   getSkillsServer,
+  getProjectsServer,
 } from "@/lib/server-data";
 import { fetchGitHubStats } from "@/lib/github";
 import { fetchCodeforcesStats } from "@/lib/codeforces";
@@ -21,11 +23,12 @@ export const revalidate = 0;
 
 export default async function HomePage() {
   // Fetch all live Firestore collections in parallel on the server
-  const [profile, careerLogs, experiences, skills] = await Promise.all([
+  const [profile, careerLogs, experiences, skills, projects] = await Promise.all([
     getProfileServer(),
     getCareerLogsServer(),
     getExperiencesServer(),
     getSkillsServer(),
+    getProjectsServer(),
   ]);
 
   // Fetch external platform statistics in parallel if handles are configured
@@ -58,6 +61,9 @@ export default async function HomePage() {
         {/* Experience Section */}
         <ExperienceSection initialExperiences={experiences} />
 
+        {/* Projects Section */}
+        <ProjectsSection initialProjects={projects} />
+
         {/* Activity Section (GitHub + Codeforces Stats) */}
         <ActivitySection
           githubStats={githubStats}
@@ -66,10 +72,9 @@ export default async function HomePage() {
           codeforcesHandle={profile.codeforcesHandle}
         />
 
-        {/* Placeholder anchor targets for future Phase 4+ sections */}
+        {/* Placeholder anchor targets for future Phase 5+ sections */}
         <div className="sr-only">
           <div id="education" />
-          <div id="projects" />
           <div id="positions" />
           <div id="contact" />
         </div>

@@ -180,6 +180,51 @@ async function seed() {
     await db.collection("skills").add(skill);
   }
 
+  // 5. Seed Projects
+  console.log("🚀 Seeding Projects Catalog...");
+  const projects = [
+    {
+      title: "HyperFlow Distributed Stream Engine",
+      description:
+        "High-throughput real-time event streaming and analytical pipeline engineered with Go, Apache Kafka, and Redis. Features sub-millisecond pub-sub routing, partition rebalancing, dynamic dead-letter queues, and real-time observability telemetry.",
+      techStack: ["Go", "Kafka", "Redis", "Docker", "gRPC", "Prometheus"],
+      githubUrl: "https://github.com/I-M-Saurav/delivery-eta-project",
+      liveUrl: "https://hyperflow-demo.vercel.app",
+      featured: true,
+      order: 1,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+    {
+      title: "OmniSync Real-Time Collaborative Canvas",
+      description:
+        "Multiplayer collaborative whiteboard and node-graph canvas built on top of WebSockets, CRDTs (Conflict-free Replicated Data Types), and WebGL rendering. Supports 50+ concurrent users with zero visual desynchronization.",
+      techStack: ["TypeScript", "Next.js 14", "WebSockets", "Canvas API", "Tailwind CSS", "Node.js"],
+      githubUrl: "https://github.com/I-M-Saurav/p2p-webshare",
+      liveUrl: "https://omnisync-canvas.vercel.app",
+      featured: true,
+      order: 2,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+    {
+      title: "TerminAI Developer CLI Copilot",
+      description:
+        "Terminal-native intelligent developer assistant integrating local LLM inference with automated shell command synthesis, git conflict resolution, and AST-aware refactoring pipelines.",
+      techStack: ["Rust", "TypeScript", "LLM APIs", "Tree-sitter", "Bash"],
+      githubUrl: "https://github.com/I-M-Saurav/CSES-Solutions",
+      liveUrl: "",
+      featured: false,
+      order: 3,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+  ];
+
+  for (const proj of projects) {
+    await db.collection("projects").add(proj);
+  }
+
   console.log("✅ Firestore database seeding completed successfully!");
   process.exit(0);
 }

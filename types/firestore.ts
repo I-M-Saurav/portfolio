@@ -69,11 +69,11 @@ export interface ProjectDocument {
   title: string;
   description: string;
   techStack: string[];
-  githubUrl?: string;
+  githubUrl: string;
   liveUrl?: string;
   imageUrl?: string;
   featured: boolean;
   order: number;
-  createdAt: Timestamp | Date | string;
+  createdAt?: Timestamp | Date | string;
   updatedAt?: Timestamp | Date | string;
 }

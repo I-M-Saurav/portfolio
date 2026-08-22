@@ -4,6 +4,7 @@ import {
   CareerLogDocument,
   ExperienceDocument,
   SkillDocument,
+  ProjectDocument,
 } from "@/types/firestore";
 import { siteContent } from "@/lib/content";
 
@@ -122,6 +123,40 @@ export async function getSkillsServer(): Promise<SkillDocument[]> {
     }
   } catch (error) {
     console.warn("getSkillsServer error, using fallback:", error);
+  }
+  return [];
+}
+
+export async function getProjectsServer(): Promise<ProjectDocument[]> {
+  try {
+    const db = getAdminDb();
+    const snap = await db.collection("projects").get();
+    if (!snap.empty) {
+      const projects: ProjectDocument[] = snap.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          title: data.title || "",
+          description: data.description || "",
+          techStack: Array.isArray(data.techStack) ? data.techStack : [],
+          githubUrl: data.githubUrl || "",
+          liveUrl: data.liveUrl || "",
+          featured: !!data.featured,
+          order: typeof data.order === "number" ? data.order : 0,
+          createdAt: data.createdAt?.toDate?.()?.toISOString() || data.createdAt || "",
+          updatedAt: data.updatedAt?.toDate?.()?.toISOString() || data.updatedAt || "",
+        };
+      });
+
+      // Sort featured projects first, then sort by order ascending
+      return projects.sort((a, b) => {
+        if (a.featured && !b.featured) return -1;
+        if (!a.featured && b.featured) return 1;
+        return (a.order || 0) - (b.order || 0);
+      });
+    }
+  } catch (error) {
+    console.warn("getProjectsServer error, using fallback:", error);
   }
   return [];
 }
