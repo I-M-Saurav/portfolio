@@ -23,7 +23,6 @@ export function ActivitySection({
     <section id="activity" className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-12 sm:py-16 md:py-20 lg:py-24">
       {/* Section Header */}
       <div className="flex items-center gap-3 mb-6 sm:mb-8">
-        <span className="font-mono text-emerald-600 dark:text-emerald-400 text-base sm:text-lg font-bold">07.</span>
         <h2 className="text-lg sm:text-xl md:text-2xl font-mono font-bold text-zinc-900 dark:text-white tracking-tight">
           Coding Activity &amp; Stats
         </h2>
