@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
 
     // 5. Send Email via Resend
     const resend = new Resend(apiKey);
-    const recipientEmail = "sauravkumar1507@gmail.com";
+    const recipientEmail = "sauravkumad1507@gmail.com";
     const formattedTimestamp = new Date().toLocaleString("en-US", {
       dateStyle: "full",
       timeStyle: "long",
