@@ -17,6 +17,8 @@ export interface ProfileDocument {
   degree?: string;
   year?: string;
   focus?: string;
+  githubUsername?: string;
+  codeforcesHandle?: string;
   quickFacts: QuickFact[];
   updatedAt?: Timestamp | Date | string;
 }

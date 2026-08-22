@@ -58,6 +58,8 @@ async function seed() {
     degree: "B.S. in Computer Science",
     year: "Class of 2025",
     focus: "Distributed Systems & Web Performance",
+    githubUsername: "torvalds",
+    codeforcesHandle: "tourist",
     resumeUrl: "https://example.com/resume.pdf",
     quickFacts: [
       { key: "degree", value: "B.S. in Computer Science" },

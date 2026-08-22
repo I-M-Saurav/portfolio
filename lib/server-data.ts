@@ -42,6 +42,8 @@ export async function getProfileServer(): Promise<ProfileDocument> {
         focus: data.focus || FALLBACK_PROFILE.focus,
         resumeUrl: data.resumeUrl || FALLBACK_PROFILE.resumeUrl,
         photoUrl: data.photoUrl || "",
+        githubUsername: data.githubUsername || "",
+        codeforcesHandle: data.codeforcesHandle || "",
         quickFacts: Array.isArray(data.quickFacts) ? data.quickFacts : FALLBACK_PROFILE.quickFacts,
         updatedAt: data.updatedAt?.toDate?.()?.toISOString() || data.updatedAt || "",
       };

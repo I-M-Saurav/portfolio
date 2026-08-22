@@ -5,24 +5,33 @@ import { Hero } from "@/components/hero";
 import { AboutSection } from "@/components/about-section";
 import { SkillsSection } from "@/components/skills-section";
 import { ExperienceSection } from "@/components/experience-section";
+import { ActivitySection } from "@/components/activity-section";
 import {
   getProfileServer,
   getCareerLogsServer,
   getExperiencesServer,
   getSkillsServer,
 } from "@/lib/server-data";
+import { fetchGitHubStats } from "@/lib/github";
+import { fetchCodeforcesStats } from "@/lib/codeforces";
 
 // Force dynamic per-request rendering to guarantee 100% fresh data on every load
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function HomePage() {
-  // Fetch all live Firestore collections in parallel on the server using Firebase Admin SDK
+  // Fetch all live Firestore collections in parallel on the server
   const [profile, careerLogs, experiences, skills] = await Promise.all([
     getProfileServer(),
     getCareerLogsServer(),
     getExperiencesServer(),
     getSkillsServer(),
+  ]);
+
+  // Fetch external platform statistics in parallel if handles are configured
+  const [githubStats, codeforcesStats] = await Promise.all([
+    fetchGitHubStats(profile.githubUsername),
+    fetchCodeforcesStats(profile.codeforcesHandle),
   ]);
 
   return (
@@ -49,12 +58,19 @@ export default async function HomePage() {
         {/* Experience Section */}
         <ExperienceSection initialExperiences={experiences} />
 
-        {/* Placeholder anchor targets for future Phase 3+ sections */}
+        {/* Activity Section (GitHub + Codeforces Stats) */}
+        <ActivitySection
+          githubStats={githubStats}
+          githubUsername={profile.githubUsername}
+          codeforcesStats={codeforcesStats}
+          codeforcesHandle={profile.codeforcesHandle}
+        />
+
+        {/* Placeholder anchor targets for future Phase 4+ sections */}
         <div className="sr-only">
           <div id="education" />
           <div id="projects" />
           <div id="positions" />
-          <div id="activity" />
           <div id="contact" />
         </div>
       </main>

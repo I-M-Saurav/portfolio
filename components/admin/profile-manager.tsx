@@ -18,6 +18,8 @@ import {
   Link as LinkIcon,
   Mail,
   MapPin,
+  Github,
+  Code2,
 } from "lucide-react";
 
 export function ProfileManager() {
@@ -253,6 +255,38 @@ export function ProfileManager() {
               onChange={(e) => setProfile({ ...profile, location: e.target.value })}
               placeholder="City, State / Remote"
               className="w-full pl-9 pr-3.5 py-2 rounded-lg border border-black/10 dark:border-white/10 bg-white/50 dark:bg-zinc-950/50 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-zinc-600 dark:text-zinc-400 mb-1.5 font-medium">
+            GITHUB_USERNAME:
+          </label>
+          <div className="relative">
+            <Github className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={profile.githubUsername || ""}
+              onChange={(e) => setProfile({ ...profile, githubUsername: e.target.value })}
+              placeholder="e.g. torvalds"
+              className="w-full pl-9 pr-3.5 py-2 rounded-lg border border-black/10 dark:border-white/10 bg-white/50 dark:bg-zinc-950/50 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-zinc-600 dark:text-zinc-400 mb-1.5 font-medium">
+            CODEFORCES_HANDLE:
+          </label>
+          <div className="relative">
+            <Code2 className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={profile.codeforcesHandle || ""}
+              onChange={(e) => setProfile({ ...profile, codeforcesHandle: e.target.value })}
+              placeholder="e.g. tourist"
+              className="w-full pl-9 pr-3.5 py-2 rounded-lg border border-black/10 dark:border-white/10 bg-white/50 dark:bg-zinc-950/50 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono"
             />
           </div>
         </div>
