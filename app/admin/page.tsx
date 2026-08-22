@@ -2,12 +2,30 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { LogOut, Terminal, ArrowLeft, ShieldCheck, Loader2 } from "lucide-react";
+import {
+  User,
+  GitCommit,
+  Briefcase,
+  Cpu,
+  LogOut,
+  Terminal,
+  ArrowLeft,
+  Loader2,
+  ShieldCheck,
+} from "lucide-react";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { ProfileManager } from "@/components/admin/profile-manager";
+import { CareerManager } from "@/components/admin/career-manager";
+import { ExperienceManager } from "@/components/admin/experience-manager";
+import { SkillsManager } from "@/components/admin/skills-manager";
+import { motion, AnimatePresence } from "framer-motion";
+
+type AdminTab = "profile" | "career" | "experience" | "skills";
 
 export default function AdminDashboardPage() {
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState<AdminTab>("profile");
   const [loggingOut, setLoggingOut] = useState(false);
 
   const handleLogout = async () => {
@@ -23,89 +41,103 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const tabs: { id: AdminTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+    { id: "profile", label: "Profile & About", icon: User },
+    { id: "career", label: "Career Log", icon: GitCommit },
+    { id: "experience", label: "Experience", icon: Briefcase },
+    { id: "skills", label: "Skills", icon: Cpu },
+  ];
+
   return (
-    <div className="min-h-screen bg-background-light dark:bg-background-dark text-foreground-light dark:text-foreground-dark flex flex-col justify-between p-6">
-      {/* Top Navbar */}
-      <header className="max-w-5xl w-full mx-auto flex items-center justify-between py-2">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-xs font-mono text-zinc-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>return to public site</span>
-        </Link>
-        <div className="flex items-center gap-3">
-          <ThemeToggle />
-          <button
-            type="button"
-            onClick={handleLogout}
-            disabled={loggingOut}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-red-500/20 bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/20 font-mono text-xs font-medium transition-all active:scale-[0.98] disabled:opacity-50"
-          >
-            {loggingOut ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            ) : (
-              <LogOut className="w-3.5 h-3.5" />
-            )}
-            <span>Logout</span>
-          </button>
+    <div className="min-h-screen bg-background-light dark:bg-background-dark text-foreground-light dark:text-foreground-dark flex flex-col font-sans">
+      {/* Top Admin Header */}
+      <header className="sticky top-0 z-30 border-b border-black/10 dark:border-white/10 bg-white/80 dark:bg-[#0e0e14]/90 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-1.5 text-xs font-mono text-zinc-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span className="hidden sm:inline">return to site</span>
+            </Link>
+            <div className="h-4 w-[1px] bg-black/10 dark:bg-white/10 hidden sm:block" />
+            <div className="flex items-center gap-2 font-mono text-sm font-bold text-zinc-900 dark:text-white">
+              <Terminal className="w-4 h-4 text-emerald-500" />
+              <span>Admin Console</span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 hidden md:inline-flex items-center gap-1">
+                <ShieldCheck className="w-3 h-3" />
+                AUTHENTICATED
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <button
+              type="button"
+              onClick={handleLogout}
+              disabled={loggingOut}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-500/20 bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/20 font-mono text-xs font-medium transition-all active:scale-[0.98] disabled:opacity-50"
+            >
+              {loggingOut ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <LogOut className="w-3.5 h-3.5" />
+              )}
+              <span>Logout</span>
+            </button>
+          </div>
         </div>
       </header>
 
-      {/* Main Dashboard Placeholder */}
-      <main className="w-full max-w-2xl mx-auto my-auto">
-        <div className="rounded-xl border border-black/10 dark:border-white/10 bg-white/80 dark:bg-[#111116]/90 shadow-2xl backdrop-blur-md overflow-hidden">
-          {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 bg-zinc-200/70 dark:bg-zinc-900/80 border-b border-black/10 dark:border-white/10 text-xs font-mono text-zinc-500">
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-red-500/80 inline-block" />
-              <span className="w-3 h-3 rounded-full bg-yellow-500/80 inline-block" />
-              <span className="w-3 h-3 rounded-full bg-emerald-500/80 inline-block" />
-              <span className="ml-2 text-zinc-600 dark:text-zinc-400 flex items-center gap-1">
-                <Terminal className="w-3 h-3 text-emerald-500" />
-                admin_console.sh
-              </span>
-            </div>
-            <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1 text-[11px]">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              AUTHENTICATED
-            </span>
-          </div>
-
-          {/* Body */}
-          <div className="p-8 text-center space-y-6">
-            <div className="w-14 h-14 mx-auto rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center border border-emerald-500/20">
-              <Terminal className="w-7 h-7" />
-            </div>
-
-            <div>
-              <h1 className="text-xl font-mono font-bold text-zinc-900 dark:text-white">
-                Admin Dashboard — Coming in Phase 2
-              </h1>
-              <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 font-mono mt-2 max-w-md mx-auto leading-relaxed">
-                Authentication and session management are active. Firestore project management,
-                live editing, and analytics will be configured in Phase 2.
-              </p>
-            </div>
-
-            <div className="pt-2">
+      {/* Main Admin Body */}
+      <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 md:px-12 py-8 flex-grow">
+        {/* Navigation Tabs Bar */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-6 border-b border-black/10 dark:border-white/10 font-mono text-xs no-scrollbar">
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
               <button
+                key={tab.id}
                 type="button"
-                onClick={handleLogout}
-                disabled={loggingOut}
-                className="px-6 py-2.5 rounded-lg bg-zinc-900 dark:bg-zinc-100 text-zinc-100 dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-200 font-mono text-xs font-semibold inline-flex items-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50"
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-lg transition-all shrink-0 ${
+                  isActive
+                    ? "bg-emerald-600 text-white font-semibold shadow-md shadow-emerald-600/20"
+                    : "bg-white/40 dark:bg-white/5 text-zinc-600 dark:text-zinc-400 hover:bg-black/5 dark:hover:bg-white/10 hover:text-zinc-900 dark:hover:text-zinc-200 border border-black/10 dark:border-white/10"
+                }`}
               >
-                {loggingOut ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4" />}
-                <span>Terminate Session (Logout)</span>
+                <Icon className="w-4 h-4" />
+                <span>{tab.label}</span>
               </button>
-            </div>
-          </div>
+            );
+          })}
+        </div>
+
+        {/* Tab Content Container with Smooth Animation */}
+        <div className="rounded-xl border border-black/10 dark:border-white/10 bg-white/70 dark:bg-[#111116]/80 shadow-2xl backdrop-blur-md p-6 sm:p-8 min-h-[500px]">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+            >
+              {activeTab === "profile" && <ProfileManager />}
+              {activeTab === "career" && <CareerManager />}
+              {activeTab === "experience" && <ExperienceManager />}
+              {activeTab === "skills" && <SkillsManager />}
+            </motion.div>
+          </AnimatePresence>
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="text-center text-xs font-mono text-zinc-400 py-2">
-        <span>Session active &bull; Next.js 14 App Router</span>
+      {/* Admin Footer */}
+      <footer className="border-t border-black/10 dark:border-white/10 py-4 px-6 text-center font-mono text-xs text-zinc-500">
+        <span>Portfolio Admin Console &bull; Connected to Firestore &amp; Firebase Storage</span>
       </footer>
     </div>
   );

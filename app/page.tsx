@@ -2,6 +2,9 @@ import React from "react";
 import { BootSequence } from "@/components/boot-sequence";
 import { Navbar } from "@/components/navbar";
 import { Hero } from "@/components/hero";
+import { AboutSection } from "@/components/about-section";
+import { SkillsSection } from "@/components/skills-section";
+import { ExperienceSection } from "@/components/experience-section";
 
 export default function HomePage() {
   return (
@@ -13,20 +16,27 @@ export default function HomePage() {
       <Navbar />
 
       {/* Main Content */}
-      <main className="flex-grow flex flex-col">
+      <main className="flex-grow flex flex-col space-y-4">
         {/* Hero Section */}
         <section id="hero">
           <Hero />
         </section>
 
-        {/* Placeholder anchor targets for navigation links (Phase 2 content) */}
+        {/* About Section */}
+        <AboutSection />
+
+        {/* Skills Section */}
+        <SkillsSection />
+
+        {/* Experience Section */}
+        <ExperienceSection />
+
+        {/* Placeholder anchor targets for future Phase 3+ sections */}
         <div className="sr-only">
-          <div id="about" />
-          <div id="experience" />
           <div id="education" />
           <div id="projects" />
           <div id="positions" />
-          <div id="profiles" />
+          <div id="activity" />
           <div id="contact" />
         </div>
       </main>

@@ -45,11 +45,12 @@ export const siteContent: SiteContent = {
   ],
   navLinks: [
     { name: "About", href: "#about" },
+    { name: "Skills", href: "#skills" },
     { name: "Experience", href: "#experience" },
     { name: "Education", href: "#education" },
     { name: "Projects", href: "#projects" },
     { name: "Positions", href: "#positions" },
-    { name: "Profiles", href: "#profiles" },
+    { name: "Activity", href: "#activity" },
     { name: "Contact", href: "#contact" },
   ],
   cta: {
