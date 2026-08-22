@@ -180,6 +180,9 @@ export function ProfileManager() {
       );
 
       toast("Resume uploaded and saved to Cloudinary!", "success");
+      if (data.warning) {
+        toast(data.warning, "info");
+      }
     } catch (err: any) {
       console.error("Resume upload error:", err);
       toast(err?.message || "Failed to upload resume.", "error");

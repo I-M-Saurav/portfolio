@@ -163,12 +163,30 @@ export async function POST(request: NextRequest) {
       }
     );
 
+    // 6. Verify URL accessibility
+    let isAccessible = true;
+    let warningMessage: string | undefined = undefined;
+
+    try {
+      const verifyRes = await fetch(uploadResult.secure_url, { method: "HEAD" });
+      if (verifyRes.status === 401) {
+        isAccessible = false;
+        warningMessage =
+          "Cloudinary has restricted PDF delivery. Please go to Cloudinary Console > Settings > Security and uncheck 'PDF and ZIP files delivery' to allow public access.";
+        console.warn(`Cloudinary URL returned 401: ${uploadResult.secure_url}`);
+      }
+    } catch (verifyErr) {
+      console.warn("Could not verify Cloudinary URL accessibility:", verifyErr);
+    }
+
     return NextResponse.json(
       {
         success: true,
         secure_url: uploadResult.secure_url,
         public_id: uploadResult.public_id,
         filename: file.name,
+        verified: isAccessible,
+        warning: warningMessage,
       },
       { status: 200 }
     );
