@@ -243,48 +243,48 @@ export function AboutSection({ initialProfile, initialCareerLogs }: AboutSection
                 className="space-y-6 sm:space-y-8"
               >
                 {/* Profile Top Row: Photo + Bio & Metadata */}
-                <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6 md:gap-8">
-                  {/* Photo / Avatar Frame */}
-                  <div className="relative group shrink-0 self-start">
-                    <div className="w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 rounded-2xl border-2 border-emerald-500/30 dark:border-emerald-400/30 overflow-hidden bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center shadow-lg">
+                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-7 md:gap-9">
+                  {/* Photo / Avatar Frame (Larger & More Prominent) */}
+                  <div className="relative group shrink-0 self-center sm:self-start">
+                    <div className="w-32 h-32 sm:w-44 sm:h-44 md:w-48 md:h-48 lg:w-52 lg:h-52 aspect-square rounded-2xl border-2 border-emerald-500/30 dark:border-emerald-400/30 ring-4 ring-black/5 dark:ring-white/5 overflow-hidden bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center shadow-xl transition-transform duration-300 group-hover:scale-[1.02]">
                       {profile.photoUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
                           src={profile.photoUrl}
                           alt={profile.name}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover object-center"
                         />
                       ) : (
                         <div className="flex flex-col items-center justify-center text-zinc-400">
-                          <User className="w-8 sm:w-12 h-8 sm:h-12 text-zinc-400 dark:text-zinc-600" />
-                          <span className="font-mono text-[9px] sm:text-[10px] mt-1 text-zinc-500">no_photo.png</span>
+                          <User className="w-12 sm:w-16 h-12 sm:h-16 text-zinc-400 dark:text-zinc-600" />
+                          <span className="font-mono text-[10px] sm:text-xs mt-1 text-zinc-500">no_photo.png</span>
                         </div>
                       )}
                     </div>
-                    <div className="absolute -bottom-1.5 -right-1.5 px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-mono bg-emerald-600 text-white shadow">
+                    <div className="absolute -bottom-2 -right-2 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-mono font-bold bg-emerald-600 text-white shadow-md border border-emerald-400/40 tracking-wider">
                       DEV
                     </div>
                   </div>
 
-                  {/* Header info */}
-                  <div className="space-y-2.5 sm:space-y-3 flex-grow min-w-0">
+                  {/* Header info & Bio */}
+                  <div className="space-y-3 sm:space-y-3.5 flex-grow min-w-0 text-center sm:text-left">
                     <div>
-                      <h3 className="text-lg sm:text-xl md:text-2xl font-bold font-mono text-zinc-900 dark:text-white break-words">
+                      <h3 className="text-xl sm:text-2xl md:text-3xl font-bold font-mono text-zinc-900 dark:text-white break-words tracking-tight">
                         {profile.name}
                       </h3>
-                      <p className="text-xs sm:text-sm font-mono text-emerald-600 dark:text-emerald-400 mt-0.5 break-words">
+                      <p className="text-xs sm:text-sm md:text-base font-mono text-emerald-600 dark:text-emerald-400 mt-1 break-words font-medium">
                         {profile.tagline}
                       </p>
                     </div>
 
                     {profile.location && (
-                      <div className="flex items-center gap-1.5 text-xs font-mono text-zinc-500 dark:text-zinc-400">
+                      <div className="flex items-center justify-center sm:justify-start gap-1.5 text-xs font-mono text-zinc-500 dark:text-zinc-400">
                         <MapPin className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                         <span className="break-words">{profile.location}</span>
                       </div>
                     )}
 
-                    <p className="text-xs sm:text-sm font-sans text-zinc-700 dark:text-zinc-300 leading-relaxed pt-0.5">
+                    <p className="text-xs sm:text-sm md:text-[14.5px] font-sans text-zinc-700 dark:text-zinc-300 leading-relaxed pt-1">
                       {profile.bio}
                     </p>
                   </div>
