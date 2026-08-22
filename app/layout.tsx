@@ -67,11 +67,20 @@ export async function generateMetadata(): Promise<Metadata> {
       url: "/",
       locale: "en_US",
       siteName: `${profile.name} Portfolio`,
+      images: [
+        {
+          url: "/api/og",
+          width: 1200,
+          height: 630,
+          alt: `${profile.name} — Portfolio Preview`,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
+      images: ["/api/og"],
       creator: profile.twitterUrl ? `@${profile.twitterUrl.split("/").pop()}` : undefined,
     },
     robots: {
