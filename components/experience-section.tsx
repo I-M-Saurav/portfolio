@@ -38,12 +38,17 @@ const FALLBACK_EXPERIENCE: ExperienceDocument[] = [
   },
 ];
 
-export function ExperienceSection() {
-  const [experiences, setExperiences] = useState<ExperienceDocument[]>(FALLBACK_EXPERIENCE);
+interface ExperienceSectionProps {
+  initialExperiences?: ExperienceDocument[];
+}
+
+export function ExperienceSection({ initialExperiences }: ExperienceSectionProps) {
+  const [experiences, setExperiences] = useState<ExperienceDocument[]>(
+    initialExperiences && initialExperiences.length > 0 ? initialExperiences : FALLBACK_EXPERIENCE
+  );
   const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({
-    "1": true, // First item expanded by default
+    [experiences[0]?.id || "1"]: true,
   });
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let unsubscribe = () => {};
@@ -63,16 +68,13 @@ export function ExperienceSection() {
               setExpandedIds((prev) => (Object.keys(prev).length === 0 ? { [list[0].id!]: true } : prev));
             }
           }
-          setLoading(false);
         },
         (err) => {
           console.warn("ExperienceSection: onSnapshot error:", err);
-          setLoading(false);
         }
       );
     } catch (err) {
       console.warn("ExperienceSection: initialization error:", err);
-      setLoading(false);
     }
 
     return () => unsubscribe();

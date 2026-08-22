@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { getFirebaseDb } from "@/lib/firebase/client";
 import { SkillDocument, SkillCategory } from "@/types/firestore";
-import { Terminal, Cpu, Layers } from "lucide-react";
+import { Cpu, Layers } from "lucide-react";
 
 const CATEGORIES: SkillCategory[] = [
   "Languages",
@@ -56,9 +56,14 @@ const FALLBACK_SKILLS: SkillDocument[] = [
   { id: "28", name: "Linux / Shell Scripting", category: "Tools", proficiency: 85, order: 3 },
 ];
 
-export function SkillsSection() {
-  const [skills, setSkills] = useState<SkillDocument[]>(FALLBACK_SKILLS);
-  const [loading, setLoading] = useState(true);
+interface SkillsSectionProps {
+  initialSkills?: SkillDocument[];
+}
+
+export function SkillsSection({ initialSkills }: SkillsSectionProps) {
+  const [skills, setSkills] = useState<SkillDocument[]>(
+    initialSkills && initialSkills.length > 0 ? initialSkills : FALLBACK_SKILLS
+  );
 
   useEffect(() => {
     let unsubscribe = () => {};
@@ -75,16 +80,13 @@ export function SkillsSection() {
             });
             setSkills(list);
           }
-          setLoading(false);
         },
         (err) => {
           console.warn("SkillsSection: onSnapshot error:", err);
-          setLoading(false);
         }
       );
     } catch (err) {
       console.warn("SkillsSection: initialization error:", err);
-      setLoading(false);
     }
 
     return () => unsubscribe();

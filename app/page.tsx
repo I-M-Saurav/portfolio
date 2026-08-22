@@ -5,8 +5,26 @@ import { Hero } from "@/components/hero";
 import { AboutSection } from "@/components/about-section";
 import { SkillsSection } from "@/components/skills-section";
 import { ExperienceSection } from "@/components/experience-section";
+import {
+  getProfileServer,
+  getCareerLogsServer,
+  getExperiencesServer,
+  getSkillsServer,
+} from "@/lib/server-data";
 
-export default function HomePage() {
+// Force dynamic per-request rendering to guarantee 100% fresh data on every load
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+export default async function HomePage() {
+  // Fetch all live Firestore collections in parallel on the server using Firebase Admin SDK
+  const [profile, careerLogs, experiences, skills] = await Promise.all([
+    getProfileServer(),
+    getCareerLogsServer(),
+    getExperiencesServer(),
+    getSkillsServer(),
+  ]);
+
   return (
     <div className="min-h-screen bg-background-light dark:bg-background-dark text-foreground-light dark:text-foreground-dark flex flex-col selection:bg-emerald-500/20 selection:text-emerald-400">
       {/* Boot sequence animation on first load */}
@@ -19,17 +37,17 @@ export default function HomePage() {
       <main className="flex-grow flex flex-col space-y-4">
         {/* Hero Section */}
         <section id="hero">
-          <Hero />
+          <Hero initialProfile={profile} />
         </section>
 
         {/* About Section */}
-        <AboutSection />
+        <AboutSection initialProfile={profile} initialCareerLogs={careerLogs} />
 
         {/* Skills Section */}
-        <SkillsSection />
+        <SkillsSection initialSkills={skills} />
 
         {/* Experience Section */}
-        <ExperienceSection />
+        <ExperienceSection initialExperiences={experiences} />
 
         {/* Placeholder anchor targets for future Phase 3+ sections */}
         <div className="sr-only">
@@ -44,7 +62,7 @@ export default function HomePage() {
       {/* Minimalistic Terminal Footer */}
       <footer className="w-full border-t border-black/10 dark:border-white/10 py-8 px-6 md:px-12 text-center font-mono text-xs text-zinc-500 dark:text-zinc-500">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p>© {new Date().getFullYear()} Alex Developer. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} {profile.name || "Portfolio"}. All rights reserved.</p>
           <p className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse" />
             <span>sys_status: operational</span>

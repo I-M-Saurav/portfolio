@@ -7,12 +7,18 @@ import { ProfileDocument } from "@/types/firestore";
 import { siteContent } from "@/lib/content";
 import { ArrowUpRight, Mail, Terminal } from "lucide-react";
 
-export function Hero() {
-  const [profile, setProfile] = useState<Partial<ProfileDocument>>({
-    name: siteContent.name,
-    tagline: siteContent.identity,
-    bio: siteContent.bio,
-  });
+interface HeroProps {
+  initialProfile?: ProfileDocument;
+}
+
+export function Hero({ initialProfile }: HeroProps) {
+  const [profile, setProfile] = useState<Partial<ProfileDocument>>(
+    initialProfile || {
+      name: siteContent.name,
+      tagline: siteContent.identity,
+      bio: siteContent.bio,
+    }
+  );
 
   useEffect(() => {
     try {
@@ -26,7 +32,7 @@ export function Hero() {
           }
         },
         (error) => {
-          console.warn("Hero: Firestore profile listener error, falling back to static config:", error);
+          console.warn("Hero: Firestore profile listener error:", error);
         }
       );
       return () => unsubscribe();

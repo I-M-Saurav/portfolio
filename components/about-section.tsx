@@ -28,7 +28,7 @@ const FALLBACK_PROFILE: ProfileDocument = {
   tagline: siteContent.identity,
   location: "San Francisco, CA / Remote",
   bio: siteContent.bio,
-  email: "alex.developer@example.com",
+  email: "saurav_k@ece.iitr.ac.in",
   degree: "B.S. in Computer Science",
   year: "Class of 2025",
   focus: "Distributed Systems & Web Performance",
@@ -87,12 +87,16 @@ function generateCommitHash(seed: string, index: number): string {
   return hash;
 }
 
-export function AboutSection() {
+interface AboutSectionProps {
+  initialProfile?: ProfileDocument;
+  initialCareerLogs?: CareerLogDocument[];
+}
+
+export function AboutSection({ initialProfile, initialCareerLogs }: AboutSectionProps) {
   const [activeTab, setActiveTab] = useState<"about.md" | "career.log">("about.md");
-  const [profile, setProfile] = useState<ProfileDocument>(FALLBACK_PROFILE);
-  const [careerLogs, setCareerLogs] = useState<CareerLogDocument[]>(FALLBACK_LOGS);
+  const [profile, setProfile] = useState<ProfileDocument>(initialProfile || FALLBACK_PROFILE);
+  const [careerLogs, setCareerLogs] = useState<CareerLogDocument[]>(initialCareerLogs || FALLBACK_LOGS);
   const [copied, setCopied] = useState(false);
-  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -110,11 +114,9 @@ export function AboutSection() {
           if (snap.exists()) {
             setProfile(snap.data() as ProfileDocument);
           }
-          setLoading(false);
         },
         (err) => {
           console.warn("AboutSection: Profile listener error:", err);
-          setLoading(false);
         }
       );
 
@@ -137,7 +139,6 @@ export function AboutSection() {
       );
     } catch (err) {
       console.warn("AboutSection: Firestore init error:", err);
-      setLoading(false);
     }
 
     return () => {
