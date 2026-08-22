@@ -62,9 +62,12 @@ export async function fetchCodeforcesStats(handle?: string): Promise<CodeforcesS
     const dailySubmissionMap: Record<string, number> = {};
 
     try {
-      const statusRes = await fetch(`https://codeforces.com/api/user.status?handle=${cleanHandle}`, {
-        next: { revalidate: 3600 },
-      });
+      const statusRes = await fetch(
+        `https://codeforces.com/api/user.status?handle=${cleanHandle}&from=1&count=10000`,
+        {
+          next: { revalidate: 3600 },
+        }
+      );
       if (statusRes.ok) {
         const statusData = await statusRes.json();
         if (statusData.status === "OK" && Array.isArray(statusData.result)) {

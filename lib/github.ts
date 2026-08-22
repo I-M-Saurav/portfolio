@@ -7,6 +7,9 @@ const GITHUB_GRAPHQL_QUERY = `
       repositories(ownerAffiliations: OWNER) {
         totalCount
       }
+      allAffiliated: repositories(affiliations: [OWNER, COLLABORATOR, ORGANIZATION_MEMBER]) {
+        totalCount
+      }
       contributionsCollection {
         restrictedContributionsCount
         contributionCalendar {
@@ -23,6 +26,9 @@ const GITHUB_GRAPHQL_QUERY = `
     }
     user(login: $username) {
       repositories(ownerAffiliations: OWNER) {
+        totalCount
+      }
+      allAffiliated: repositories(affiliations: [OWNER, COLLABORATOR, ORGANIZATION_MEMBER]) {
         totalCount
       }
       contributionsCollection {
@@ -60,7 +66,6 @@ export async function fetchGitHubStats(username?: string): Promise<GitHubStats |
       userHeaders.Authorization = `Bearer ${token}`;
     }
 
-    // Try authenticated /user first if token matches, or fallback to /users/{username}
     let userData: any = null;
     if (token) {
       try {
@@ -95,7 +100,9 @@ export async function fetchGitHubStats(username?: string): Promise<GitHubStats |
 
     let totalContributions = 0;
     let weeks: ContributionWeek[] = [];
-    let totalRepos = (userData.public_repos || 0) + (userData.total_private_repos || userData.owned_private_repos || 0);
+    let totalRepos =
+      (userData.public_repos || 0) +
+      (userData.total_private_repos || userData.owned_private_repos || 0);
 
     // 2. Fetch Contributions & Repository counts via GraphQL API
     if (token) {
@@ -121,7 +128,6 @@ export async function fetchGitHubStats(username?: string): Promise<GitHubStats |
           const viewer = gqlData?.data?.viewer;
           const user = gqlData?.data?.user;
 
-          // If the authenticated token belongs to this user, prioritize viewer data
           if (viewer && viewer.login && viewer.login.toLowerCase() === cleanUsername.toLowerCase()) {
             const viewerCollection = viewer.contributionsCollection;
             const viewerCalendar = viewerCollection?.contributionCalendar;
@@ -131,9 +137,9 @@ export async function fetchGitHubStats(username?: string): Promise<GitHubStats |
               totalContributions = viewerCalendar.totalContributions || 0;
             }
 
-            if (typeof viewer.repositories?.totalCount === "number") {
-              totalRepos = Math.max(totalRepos, viewer.repositories.totalCount);
-            }
+            const ownerCount = viewer.repositories?.totalCount || 0;
+            const allCount = viewer.allAffiliated?.totalCount || 0;
+            totalRepos = Math.max(totalRepos, ownerCount, allCount);
           } else if (user) {
             const userCollection = user.contributionsCollection;
             const userCalendar = userCollection?.contributionCalendar;
@@ -143,9 +149,9 @@ export async function fetchGitHubStats(username?: string): Promise<GitHubStats |
               totalContributions = userCalendar.totalContributions || 0;
             }
 
-            if (typeof user.repositories?.totalCount === "number") {
-              totalRepos = Math.max(totalRepos, user.repositories.totalCount);
-            }
+            const ownerCount = user.repositories?.totalCount || 0;
+            const allCount = user.allAffiliated?.totalCount || 0;
+            totalRepos = Math.max(totalRepos, ownerCount, allCount);
           }
         }
       } catch (gqlErr) {
