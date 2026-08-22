@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, setPersistence, browserLocalPersistence } from "firebase/auth";
 import { getFirebaseAuth } from "@/lib/firebase/client";
 import { Lock, Mail, Terminal, ArrowLeft, Loader2, AlertCircle } from "lucide-react";
 import Link from "next/link";
@@ -21,8 +21,9 @@ export default function AdminLoginPage() {
     setLoading(true);
 
     try {
-      // 1. Authenticate with Firebase Client SDK
+      // 1. Authenticate with Firebase Client SDK with local persistence
       const auth = getFirebaseAuth();
+      await setPersistence(auth, browserLocalPersistence);
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const idToken = await userCredential.user.getIdToken();
 

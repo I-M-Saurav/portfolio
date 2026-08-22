@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signOut } from "firebase/auth";
+import { getFirebaseAuth } from "@/lib/firebase/client";
 import {
   User,
   GitCommit,
@@ -31,6 +33,7 @@ export default function AdminDashboardPage() {
   const handleLogout = async () => {
     setLoggingOut(true);
     try {
+      await signOut(getFirebaseAuth());
       await fetch("/api/auth/logout", { method: "POST" });
       router.push("/admin/login");
       router.refresh();
