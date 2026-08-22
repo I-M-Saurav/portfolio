@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { collection, getDocs, query, orderBy } from "firebase/firestore";
+import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { getFirebaseDb } from "@/lib/firebase/client";
 import { ExperienceDocument } from "@/types/firestore";
 import { motion, AnimatePresence } from "framer-motion";
@@ -46,29 +46,36 @@ export function ExperienceSection() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadExperiences() {
-      try {
-        const db = getFirebaseDb();
-        const expQuery = query(collection(db, "experience"), orderBy("order", "asc"));
-        const snapshot = await getDocs(expQuery);
-        if (!snapshot.empty) {
-          const list: ExperienceDocument[] = [];
-          snapshot.forEach((docSnap) => {
-            list.push({ id: docSnap.id, ...(docSnap.data() as Omit<ExperienceDocument, "id">) });
-          });
-          setExperiences(list);
-          if (list[0]?.id) {
-            setExpandedIds({ [list[0].id]: true });
+    let unsubscribe = () => {};
+    try {
+      const db = getFirebaseDb();
+      const expQuery = query(collection(db, "experience"), orderBy("order", "asc"));
+      unsubscribe = onSnapshot(
+        expQuery,
+        (snapshot) => {
+          if (!snapshot.empty) {
+            const list: ExperienceDocument[] = [];
+            snapshot.forEach((docSnap) => {
+              list.push({ id: docSnap.id, ...(docSnap.data() as Omit<ExperienceDocument, "id">) });
+            });
+            setExperiences(list);
+            if (list[0]?.id) {
+              setExpandedIds((prev) => (Object.keys(prev).length === 0 ? { [list[0].id!]: true } : prev));
+            }
           }
+          setLoading(false);
+        },
+        (err) => {
+          console.warn("ExperienceSection: onSnapshot error:", err);
+          setLoading(false);
         }
-      } catch (err) {
-        console.warn("Using fallback experience data:", err);
-      } finally {
-        setLoading(false);
-      }
+      );
+    } catch (err) {
+      console.warn("ExperienceSection: initialization error:", err);
+      setLoading(false);
     }
 
-    loadExperiences();
+    return () => unsubscribe();
   }, []);
 
   const toggleExpand = (id: string) => {

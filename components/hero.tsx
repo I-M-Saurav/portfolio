@@ -1,10 +1,45 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { doc, onSnapshot } from "firebase/firestore";
+import { getFirebaseDb } from "@/lib/firebase/client";
+import { ProfileDocument } from "@/types/firestore";
 import { siteContent } from "@/lib/content";
 import { ArrowUpRight, Mail, Terminal } from "lucide-react";
 
 export function Hero() {
+  const [profile, setProfile] = useState<Partial<ProfileDocument>>({
+    name: siteContent.name,
+    tagline: siteContent.identity,
+    bio: siteContent.bio,
+  });
+
+  useEffect(() => {
+    try {
+      const db = getFirebaseDb();
+      const profileDocRef = doc(db, "profile", "main");
+      const unsubscribe = onSnapshot(
+        profileDocRef,
+        (snap) => {
+          if (snap.exists()) {
+            setProfile(snap.data() as ProfileDocument);
+          }
+        },
+        (error) => {
+          console.warn("Hero: Firestore profile listener error, falling back to static config:", error);
+        }
+      );
+      return () => unsubscribe();
+    } catch (err) {
+      console.warn("Hero: Firestore initialization error:", err);
+    }
+  }, []);
+
+  const displayName = profile.name || siteContent.name;
+  const displayIdentity = profile.tagline || siteContent.identity;
+  const displayBio = profile.bio || siteContent.bio;
+  const displayStatus = siteContent.status;
+
   return (
     <section className="w-full max-w-7xl mx-auto px-6 md:px-12 pt-10 md:pt-16 pb-16 md:pb-24">
       {/* Terminal Window Card */}
@@ -16,7 +51,7 @@ export function Hero() {
             <span className="w-3 h-3 rounded-full bg-[#ffbd2e] inline-block shadow-sm" />
             <span className="w-3 h-3 rounded-full bg-[#27c93f] inline-block shadow-sm" />
             <div className="ml-3 hidden sm:flex items-center gap-1.5 text-zinc-600 dark:text-zinc-400">
-              <Terminal className="w-3.5 h-3.5" />
+              <Terminal className="w-3.5 h-3.5 text-emerald-500" />
               <span>bash - 80x24</span>
             </div>
           </div>
@@ -35,10 +70,10 @@ export function Hero() {
             </div>
             <div className="mt-2 pl-4 border-l-2 border-emerald-500/40 dark:border-emerald-400/30">
               <p className="text-base sm:text-lg font-bold text-zinc-900 dark:text-white">
-                {siteContent.name}
+                {displayName}
               </p>
               <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 mt-1 font-sans">
-                {siteContent.identity}
+                {displayIdentity}
               </p>
             </div>
           </div>
@@ -51,7 +86,7 @@ export function Hero() {
             </div>
             <div className="mt-2 pl-4 border-l-2 border-emerald-500/40 dark:border-emerald-400/30">
               <p className="text-xs sm:text-sm text-zinc-700 dark:text-zinc-300 font-sans leading-relaxed">
-                {siteContent.bio}
+                {displayBio}
               </p>
             </div>
           </div>
@@ -60,7 +95,7 @@ export function Hero() {
           <div className="pt-1">
             <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-mono font-medium bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 dark:border-emerald-500/30">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse mr-2 inline-block" />
-              {siteContent.status}
+              {displayStatus}
             </span>
           </div>
 

@@ -96,35 +96,54 @@ export function AboutSection() {
   const { toast } = useToast();
 
   useEffect(() => {
-    async function loadData() {
-      try {
-        const db = getFirebaseDb();
-        
-        // 1. Fetch Profile
-        const profileDocRef = doc(db, "profile", "main");
-        const profileSnap = await getDoc(profileDocRef);
-        if (profileSnap.exists()) {
-          setProfile(profileSnap.data() as ProfileDocument);
-        }
+    let unsubscribeProfile = () => {};
+    let unsubscribeCareer = () => {};
 
-        // 2. Fetch Career Logs
-        const careerQuery = query(collection(db, "careerLog"), orderBy("order", "asc"));
-        const careerSnap = await getDocs(careerQuery);
-        if (!careerSnap.empty) {
-          const logs: CareerLogDocument[] = [];
-          careerSnap.forEach((docSnap) => {
-            logs.push({ id: docSnap.id, ...(docSnap.data() as Omit<CareerLogDocument, "id">) });
-          });
-          setCareerLogs(logs);
+    try {
+      const db = getFirebaseDb();
+
+      // 1. Live listener for Profile Document
+      const profileDocRef = doc(db, "profile", "main");
+      unsubscribeProfile = onSnapshot(
+        profileDocRef,
+        (snap) => {
+          if (snap.exists()) {
+            setProfile(snap.data() as ProfileDocument);
+          }
+          setLoading(false);
+        },
+        (err) => {
+          console.warn("AboutSection: Profile listener error:", err);
+          setLoading(false);
         }
-      } catch (err) {
-        console.warn("Could not load dynamic profile/career data from Firestore, using defaults:", err);
-      } finally {
-        setLoading(false);
-      }
+      );
+
+      // 2. Live listener for Career Logs
+      const careerQuery = query(collection(db, "careerLog"), orderBy("order", "asc"));
+      unsubscribeCareer = onSnapshot(
+        careerQuery,
+        (snap) => {
+          if (!snap.empty) {
+            const logs: CareerLogDocument[] = [];
+            snap.forEach((docSnap) => {
+              logs.push({ id: docSnap.id, ...(docSnap.data() as Omit<CareerLogDocument, "id">) });
+            });
+            setCareerLogs(logs);
+          }
+        },
+        (err) => {
+          console.warn("AboutSection: Career logs listener error:", err);
+        }
+      );
+    } catch (err) {
+      console.warn("AboutSection: Firestore init error:", err);
+      setLoading(false);
     }
 
-    loadData();
+    return () => {
+      unsubscribeProfile();
+      unsubscribeCareer();
+    };
   }, []);
 
   const handleCopyEmail = async () => {

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { collection, getDocs, query, orderBy } from "firebase/firestore";
+import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { getFirebaseDb } from "@/lib/firebase/client";
 import { SkillDocument, SkillCategory } from "@/types/firestore";
 import { Terminal, Cpu, Layers } from "lucide-react";
@@ -61,26 +61,33 @@ export function SkillsSection() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadSkills() {
-      try {
-        const db = getFirebaseDb();
-        const skillsQuery = query(collection(db, "skills"), orderBy("order", "asc"));
-        const snapshot = await getDocs(skillsQuery);
-        if (!snapshot.empty) {
-          const list: SkillDocument[] = [];
-          snapshot.forEach((docSnap) => {
-            list.push({ id: docSnap.id, ...(docSnap.data() as Omit<SkillDocument, "id">) });
-          });
-          setSkills(list);
+    let unsubscribe = () => {};
+    try {
+      const db = getFirebaseDb();
+      const skillsQuery = query(collection(db, "skills"), orderBy("order", "asc"));
+      unsubscribe = onSnapshot(
+        skillsQuery,
+        (snapshot) => {
+          if (!snapshot.empty) {
+            const list: SkillDocument[] = [];
+            snapshot.forEach((docSnap) => {
+              list.push({ id: docSnap.id, ...(docSnap.data() as Omit<SkillDocument, "id">) });
+            });
+            setSkills(list);
+          }
+          setLoading(false);
+        },
+        (err) => {
+          console.warn("SkillsSection: onSnapshot error:", err);
+          setLoading(false);
         }
-      } catch (err) {
-        console.warn("Using fallback skills data:", err);
-      } finally {
-        setLoading(false);
-      }
+      );
+    } catch (err) {
+      console.warn("SkillsSection: initialization error:", err);
+      setLoading(false);
     }
 
-    loadSkills();
+    return () => unsubscribe();
   }, []);
 
   // Group skills by category
