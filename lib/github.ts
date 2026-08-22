@@ -2,8 +2,27 @@ import { GitHubStats, ContributionWeek } from "@/types/activity";
 
 const GITHUB_GRAPHQL_QUERY = `
   query($username: String!, $from: DateTime!, $to: DateTime!) {
+    viewer {
+      login
+      contributionsCollection(from: $from, to: $to) {
+        restrictedContributionsCount
+        hasAnyRestrictedContributions
+        contributionCalendar {
+          totalContributions
+          weeks {
+            contributionDays {
+              date
+              contributionCount
+              color
+            }
+          }
+        }
+      }
+    }
     user(login: $username) {
       contributionsCollection(from: $from, to: $to) {
+        restrictedContributionsCount
+        hasAnyRestrictedContributions
         contributionCalendar {
           totalContributions
           weeks {
@@ -81,10 +100,28 @@ export async function fetchGitHubStats(username?: string): Promise<GitHubStats |
 
         if (graphqlRes.ok) {
           const gqlData = await graphqlRes.json();
-          const calendar = gqlData?.data?.user?.contributionsCollection?.contributionCalendar;
-          if (calendar) {
-            totalContributions = calendar.totalContributions || 0;
-            weeks = calendar.weeks || [];
+          const viewer = gqlData?.data?.viewer;
+          const user = gqlData?.data?.user;
+
+          // If the authenticated token belongs to this user, prioritize viewer (has complete private repo access)
+          if (viewer && viewer.login && viewer.login.toLowerCase() === cleanUsername.toLowerCase()) {
+            const viewerCollection = viewer.contributionsCollection;
+            const viewerCalendar = viewerCollection?.contributionCalendar;
+            const restrictedCount = viewerCollection?.restrictedContributionsCount || 0;
+
+            if (viewerCalendar) {
+              weeks = viewerCalendar.weeks || [];
+              totalContributions = (viewerCalendar.totalContributions || 0) + restrictedCount;
+            }
+          } else if (user) {
+            const userCollection = user.contributionsCollection;
+            const userCalendar = userCollection?.contributionCalendar;
+            const restrictedCount = userCollection?.restrictedContributionsCount || 0;
+
+            if (userCalendar) {
+              weeks = userCalendar.weeks || [];
+              totalContributions = (userCalendar.totalContributions || 0) + restrictedCount;
+            }
           }
         }
       } catch (gqlErr) {
