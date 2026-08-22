@@ -68,7 +68,8 @@ export async function POST(request: NextRequest) {
     }
 
     let folder = "portfolio/profile";
-    let resourceType: "image" | "auto" | "raw" = "image";
+    let resourceType: "image" | "raw" = "image";
+    let publicId: string | undefined = undefined;
 
     // 4. Validate file based on upload type
     if (type === "photo") {
@@ -117,7 +118,12 @@ export async function POST(request: NextRequest) {
       }
 
       folder = "portfolio/resume";
-      resourceType = "auto";
+      resourceType = "raw";
+      // Cloudinary raw uploads need .pdf extension in public_id so the download URL retains the PDF extension
+      const sanitizedBaseName = file.name
+        .replace(/\.pdf$/i, "")
+        .replace(/[^a-zA-Z0-9_-]/g, "_");
+      publicId = `${sanitizedBaseName}_${Date.now()}.pdf`;
     } else {
       return NextResponse.json(
         { error: `Unsupported upload type '${type}'. Expected 'photo' or 'resume'.` },
@@ -129,13 +135,19 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
+    const uploadOptions: Record<string, any> = {
+      folder,
+      resource_type: resourceType,
+    };
+
+    if (publicId) {
+      uploadOptions.public_id = publicId;
+    }
+
     const uploadResult = await new Promise<{ secure_url: string; public_id: string }>(
       (resolve, reject) => {
         const uploadStream = cld.uploader.upload_stream(
-          {
-            folder,
-            resource_type: resourceType,
-          },
+          uploadOptions,
           (error, result) => {
             if (error || !result) {
               reject(error || new Error("Failed to receive Cloudinary response."));
