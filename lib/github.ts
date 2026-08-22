@@ -1,12 +1,14 @@
 import { GitHubStats, ContributionWeek } from "@/types/activity";
 
 const GITHUB_GRAPHQL_QUERY = `
-  query($username: String!, $from: DateTime!, $to: DateTime!) {
+  query($username: String!) {
     viewer {
       login
-      contributionsCollection(from: $from, to: $to) {
+      repositories(ownerAffiliations: OWNER) {
+        totalCount
+      }
+      contributionsCollection {
         restrictedContributionsCount
-        hasAnyRestrictedContributions
         contributionCalendar {
           totalContributions
           weeks {
@@ -20,9 +22,11 @@ const GITHUB_GRAPHQL_QUERY = `
       }
     }
     user(login: $username) {
-      contributionsCollection(from: $from, to: $to) {
+      repositories(ownerAffiliations: OWNER) {
+        totalCount
+      }
+      contributionsCollection {
         restrictedContributionsCount
-        hasAnyRestrictedContributions
         contributionCalendar {
           totalContributions
           weeks {
@@ -56,28 +60,44 @@ export async function fetchGitHubStats(username?: string): Promise<GitHubStats |
       userHeaders.Authorization = `Bearer ${token}`;
     }
 
-    const userRes = await fetch(`https://api.github.com/users/${cleanUsername}`, {
-      headers: userHeaders,
-      next: { revalidate: 3600 }, // Cache for 1 hour
-    });
-
-    if (!userRes.ok) {
-      console.warn(`GitHub REST API returned status ${userRes.status} for ${cleanUsername}`);
-      return null;
+    // Try authenticated /user first if token matches, or fallback to /users/{username}
+    let userData: any = null;
+    if (token) {
+      try {
+        const authUserRes = await fetch("https://api.github.com/user", {
+          headers: userHeaders,
+          next: { revalidate: 3600 },
+        });
+        if (authUserRes.ok) {
+          const authUser = await authUserRes.json();
+          if (authUser.login?.toLowerCase() === cleanUsername.toLowerCase()) {
+            userData = authUser;
+          }
+        }
+      } catch (authErr) {
+        console.warn("Failed to fetch /user:", authErr);
+      }
     }
 
-    const userData = await userRes.json();
+    if (!userData) {
+      const userRes = await fetch(`https://api.github.com/users/${cleanUsername}`, {
+        headers: userHeaders,
+        next: { revalidate: 3600 },
+      });
+
+      if (!userRes.ok) {
+        console.warn(`GitHub REST API returned status ${userRes.status} for ${cleanUsername}`);
+        return null;
+      }
+
+      userData = await userRes.json();
+    }
 
     let totalContributions = 0;
     let weeks: ContributionWeek[] = [];
+    let totalRepos = (userData.public_repos || 0) + (userData.total_private_repos || userData.owned_private_repos || 0);
 
-    // 2. Compute exact rolling 365-day window in UTC
-    const now = new Date();
-    const toDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 23, 59, 59));
-    const fromDate = new Date(toDate.getTime() - 365 * 24 * 60 * 60 * 1000);
-    fromDate.setUTCHours(0, 0, 0, 0);
-
-    // 3. Fetch Contributions via GraphQL API (if GITHUB_TOKEN is configured)
+    // 2. Fetch Contributions & Repository counts via GraphQL API
     if (token) {
       try {
         const graphqlRes = await fetch("https://api.github.com/graphql", {
@@ -91,8 +111,6 @@ export async function fetchGitHubStats(username?: string): Promise<GitHubStats |
             query: GITHUB_GRAPHQL_QUERY,
             variables: {
               username: cleanUsername,
-              from: fromDate.toISOString(),
-              to: toDate.toISOString(),
             },
           }),
           next: { revalidate: 3600 },
@@ -103,24 +121,30 @@ export async function fetchGitHubStats(username?: string): Promise<GitHubStats |
           const viewer = gqlData?.data?.viewer;
           const user = gqlData?.data?.user;
 
-          // If the authenticated token belongs to this user, prioritize viewer (has complete private repo access)
+          // If the authenticated token belongs to this user, prioritize viewer data
           if (viewer && viewer.login && viewer.login.toLowerCase() === cleanUsername.toLowerCase()) {
             const viewerCollection = viewer.contributionsCollection;
             const viewerCalendar = viewerCollection?.contributionCalendar;
-            const restrictedCount = viewerCollection?.restrictedContributionsCount || 0;
 
             if (viewerCalendar) {
               weeks = viewerCalendar.weeks || [];
-              totalContributions = (viewerCalendar.totalContributions || 0) + restrictedCount;
+              totalContributions = viewerCalendar.totalContributions || 0;
+            }
+
+            if (typeof viewer.repositories?.totalCount === "number") {
+              totalRepos = Math.max(totalRepos, viewer.repositories.totalCount);
             }
           } else if (user) {
             const userCollection = user.contributionsCollection;
             const userCalendar = userCollection?.contributionCalendar;
-            const restrictedCount = userCollection?.restrictedContributionsCount || 0;
 
             if (userCalendar) {
               weeks = userCalendar.weeks || [];
-              totalContributions = (userCalendar.totalContributions || 0) + restrictedCount;
+              totalContributions = userCalendar.totalContributions || 0;
+            }
+
+            if (typeof user.repositories?.totalCount === "number") {
+              totalRepos = Math.max(totalRepos, user.repositories.totalCount);
             }
           }
         }
@@ -129,7 +153,7 @@ export async function fetchGitHubStats(username?: string): Promise<GitHubStats |
       }
     }
 
-    // 4. Fallback calendar if token unavailable or zero weeks returned
+    // 3. Fallback calendar if token unavailable or zero weeks returned
     if (weeks.length === 0) {
       weeks = generateFallbackCalendar();
       totalContributions = weeks.reduce(
@@ -143,7 +167,7 @@ export async function fetchGitHubStats(username?: string): Promise<GitHubStats |
       name: userData.name || cleanUsername,
       avatarUrl: userData.avatar_url || "",
       bio: userData.bio || "",
-      publicRepos: userData.public_repos || 0,
+      publicRepos: totalRepos,
       followers: userData.followers || 0,
       following: userData.following || 0,
       htmlUrl: userData.html_url || `https://github.com/${cleanUsername}`,
