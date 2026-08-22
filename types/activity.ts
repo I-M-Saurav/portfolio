@@ -40,6 +40,8 @@ export interface CodeforcesStats {
   avatar?: string;
   organization?: string;
   totalSolved: number;
+  totalSubmissions: number;
+  weeks: ContributionWeek[];
   ratingHistory: {
     contest: string;
     rating: number;

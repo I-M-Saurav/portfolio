@@ -1,4 +1,4 @@
-import { CodeforcesStats, CodeforcesRatingChange } from "@/types/activity";
+import { CodeforcesStats, CodeforcesRatingChange, ContributionWeek } from "@/types/activity";
 
 export function getCodeforcesRankColor(rank?: string): {
   color: string;
@@ -28,7 +28,7 @@ export function getCodeforcesRankColor(rank?: string): {
   if (r.includes("newbie")) {
     return { color: "#9ca3af", badgeBg: "rgba(156, 163, 175, 0.15)", badgeBorder: "rgba(156, 163, 175, 0.3)" }; // Gray
   }
-  return { color: "#10b981", badgeBg: "rgba(16, 185, 129, 0.15)", badgeBorder: "rgba(16, 185, 129, 0.3)" };
+  return { color: "#06b6d4", badgeBg: "rgba(6, 182, 212, 0.15)", badgeBorder: "rgba(6, 182, 212, 0.3)" };
 }
 
 export async function fetchCodeforcesStats(handle?: string): Promise<CodeforcesStats | null> {
@@ -56,8 +56,11 @@ export async function fetchCodeforcesStats(handle?: string): Promise<CodeforcesS
 
     const user = userData.result[0];
 
-    // 2. Fetch User Submissions to compute unique solved problems
+    // 2. Fetch User Submissions to compute unique solved problems and daily submission counts
     let totalSolved = 0;
+    let totalSubmissionsLastYear = 0;
+    const dailySubmissionMap: Record<string, number> = {};
+
     try {
       const statusRes = await fetch(`https://codeforces.com/api/user.status?handle=${cleanHandle}`, {
         next: { revalidate: 3600 },
@@ -66,12 +69,20 @@ export async function fetchCodeforcesStats(handle?: string): Promise<CodeforcesS
         const statusData = await statusRes.json();
         if (statusData.status === "OK" && Array.isArray(statusData.result)) {
           const solvedSet = new Set<string>();
+
           statusData.result.forEach((sub: any) => {
             if (sub.verdict === "OK" && sub.problem) {
               const key = `${sub.problem.contestId}-${sub.problem.index}`;
               solvedSet.add(key);
             }
+
+            if (sub.creationTimeSeconds) {
+              const subDate = new Date(sub.creationTimeSeconds * 1000);
+              const dateStr = subDate.toISOString().split("T")[0];
+              dailySubmissionMap[dateStr] = (dailySubmissionMap[dateStr] || 0) + 1;
+            }
           });
+
           totalSolved = solvedSet.size;
         }
       }
@@ -79,7 +90,37 @@ export async function fetchCodeforcesStats(handle?: string): Promise<CodeforcesS
       console.warn("Codeforces user.status error:", statusErr);
     }
 
-    // 3. Fetch Rating History
+    // 3. Build 52-week submission calendar grid
+    const weeks: ContributionWeek[] = [];
+    const now = new Date();
+    // Find the end date (Saturday of current week or today)
+    const toDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+    const dayOfWeek = toDate.getUTCDay(); // 0 = Sunday, 6 = Saturday
+    const daysToSaturday = 6 - dayOfWeek;
+    const endCalendarDate = new Date(toDate.getTime() + daysToSaturday * 24 * 60 * 60 * 1000);
+
+    // 52 weeks * 7 days = 364 days back from endCalendarDate
+    const startCalendarDate = new Date(endCalendarDate.getTime() - (52 * 7 - 1) * 24 * 60 * 60 * 1000);
+
+    for (let w = 0; w < 52; w++) {
+      const days = [];
+      for (let d = 0; d < 7; d++) {
+        const currentDay = new Date(startCalendarDate.getTime() + (w * 7 + d) * 24 * 60 * 60 * 1000);
+        const dateKey = currentDay.toISOString().split("T")[0];
+        const count = dailySubmissionMap[dateKey] || 0;
+        if (currentDay <= toDate) {
+          totalSubmissionsLastYear += count;
+        }
+        days.push({
+          date: dateKey,
+          contributionCount: count,
+          color: count > 0 ? "#06b6d4" : "#161b22",
+        });
+      }
+      weeks.push({ contributionDays: days });
+    }
+
+    // 4. Fetch Rating History
     const ratingHistory: { contest: string; rating: number; date: string }[] = [];
     try {
       const ratingRes = await fetch(`https://codeforces.com/api/user.rating?handle=${cleanHandle}`, {
@@ -112,6 +153,8 @@ export async function fetchCodeforcesStats(handle?: string): Promise<CodeforcesS
       avatar: user.titlePhoto || user.avatar || "",
       organization: user.organization || "",
       totalSolved,
+      totalSubmissions: totalSubmissionsLastYear,
+      weeks,
       ratingHistory,
     };
   } catch (error) {

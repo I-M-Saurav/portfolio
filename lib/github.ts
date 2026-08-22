@@ -1,9 +1,9 @@
 import { GitHubStats, ContributionWeek } from "@/types/activity";
 
 const GITHUB_GRAPHQL_QUERY = `
-  query($username: String!) {
+  query($username: String!, $from: DateTime!, $to: DateTime!) {
     user(login: $username) {
-      contributionsCollection {
+      contributionsCollection(from: $from, to: $to) {
         contributionCalendar {
           totalContributions
           weeks {
@@ -52,7 +52,13 @@ export async function fetchGitHubStats(username?: string): Promise<GitHubStats |
     let totalContributions = 0;
     let weeks: ContributionWeek[] = [];
 
-    // 2. Fetch Contributions via GraphQL API (if GITHUB_TOKEN is configured)
+    // 2. Compute exact rolling 365-day window in UTC
+    const now = new Date();
+    const toDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 23, 59, 59));
+    const fromDate = new Date(toDate.getTime() - 365 * 24 * 60 * 60 * 1000);
+    fromDate.setUTCHours(0, 0, 0, 0);
+
+    // 3. Fetch Contributions via GraphQL API (if GITHUB_TOKEN is configured)
     if (token) {
       try {
         const graphqlRes = await fetch("https://api.github.com/graphql", {
@@ -64,7 +70,11 @@ export async function fetchGitHubStats(username?: string): Promise<GitHubStats |
           },
           body: JSON.stringify({
             query: GITHUB_GRAPHQL_QUERY,
-            variables: { username: cleanUsername },
+            variables: {
+              username: cleanUsername,
+              from: fromDate.toISOString(),
+              to: toDate.toISOString(),
+            },
           }),
           next: { revalidate: 3600 },
         });
@@ -82,7 +92,7 @@ export async function fetchGitHubStats(username?: string): Promise<GitHubStats |
       }
     }
 
-    // 3. Fallback mock calendar if token unavailable or zero weeks returned
+    // 4. Fallback calendar if token unavailable or zero weeks returned
     if (weeks.length === 0) {
       weeks = generateFallbackCalendar();
       totalContributions = weeks.reduce(

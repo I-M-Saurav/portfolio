@@ -3,7 +3,8 @@
 import React from "react";
 import { CodeforcesStats } from "@/types/activity";
 import { getCodeforcesRankColor } from "@/lib/codeforces";
-import { Code2, Award, CheckCircle2, TrendingUp, ArrowUpRight } from "lucide-react";
+import { Code2, Award, CheckCircle2, TrendingUp, ArrowUpRight, Flame } from "lucide-react";
+import { ActivityHeatmap } from "./activity-heatmap";
 import {
   ResponsiveContainer,
   LineChart,
@@ -21,7 +22,7 @@ interface CodeforcesActivityCardProps {
 export function CodeforcesActivityCard({ stats, handle }: CodeforcesActivityCardProps) {
   if (!handle) {
     return (
-      <div className="rounded-xl border border-black/10 dark:border-white/10 bg-white/70 dark:bg-[#111116]/80 p-6 flex flex-col items-center justify-center text-center space-y-3 min-h-[300px] shadow-md">
+      <div className="rounded-xl border border-black/10 dark:border-white/10 bg-white/70 dark:bg-[#111116]/80 p-6 flex flex-col items-center justify-center text-center space-y-3 min-h-[360px] shadow-md">
         <div className="w-12 h-12 rounded-full bg-black/5 dark:bg-white/5 flex items-center justify-center text-zinc-400">
           <Code2 className="w-6 h-6" />
         </div>
@@ -30,7 +31,7 @@ export function CodeforcesActivityCard({ stats, handle }: CodeforcesActivityCard
             Codeforces not connected yet
           </h4>
           <p className="font-mono text-xs text-zinc-500 mt-1 max-w-xs">
-            Add your Codeforces handle in the /admin profile settings to showcase competitive programming rating &amp; contest timeline.
+            Add your Codeforces handle in the /admin profile settings to showcase competitive programming rating &amp; submission activity.
           </p>
         </div>
       </div>
@@ -39,7 +40,7 @@ export function CodeforcesActivityCard({ stats, handle }: CodeforcesActivityCard
 
   if (!stats) {
     return (
-      <div className="rounded-xl border border-black/10 dark:border-white/10 bg-white/70 dark:bg-[#111116]/80 p-6 flex flex-col items-center justify-center text-center space-y-3 min-h-[300px] shadow-md">
+      <div className="rounded-xl border border-black/10 dark:border-white/10 bg-white/70 dark:bg-[#111116]/80 p-6 flex flex-col items-center justify-center text-center space-y-3 min-h-[360px] shadow-md">
         <div className="w-12 h-12 rounded-full bg-black/5 dark:bg-white/5 flex items-center justify-center text-zinc-400">
           <Code2 className="w-6 h-6" />
         </div>
@@ -133,8 +134,20 @@ export function CodeforcesActivityCard({ stats, handle }: CodeforcesActivityCard
           </div>
         </div>
 
+        {/* Codeforces Submission Activity Heatmap */}
+        {stats.weeks && stats.weeks.length > 0 && (
+          <ActivityHeatmap
+            weeks={stats.weeks}
+            totalCount={stats.totalSubmissions}
+            countLabel="submissions"
+            subLabel="in the last year"
+            icon={Flame}
+            theme="cyan"
+          />
+        )}
+
         {/* Rating History Chart */}
-        <div className="space-y-2">
+        <div className="space-y-2 pt-2 border-t border-black/10 dark:border-white/10">
           <div className="flex items-center justify-between font-mono text-xs text-zinc-600 dark:text-zinc-400">
             <div className="flex items-center gap-1.5">
               <TrendingUp className="w-3.5 h-3.5 text-cyan-500" />
@@ -143,10 +156,10 @@ export function CodeforcesActivityCard({ stats, handle }: CodeforcesActivityCard
             <span className="text-[11px] text-zinc-400">{stats.ratingHistory.length} contests</span>
           </div>
 
-          <div className="h-44 w-full rounded-lg border border-black/10 dark:border-white/10 bg-black/[0.02] dark:bg-black/40 p-2">
+          <div className="h-36 w-full rounded-lg border border-black/10 dark:border-white/10 bg-black/[0.02] dark:bg-black/40 p-2">
             {stats.ratingHistory && stats.ratingHistory.length > 1 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={stats.ratingHistory} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+                <LineChart data={stats.ratingHistory} margin={{ top: 8, right: 10, left: -25, bottom: 0 }}>
                   <XAxis
                     dataKey="date"
                     stroke="#71717a"
@@ -169,7 +182,7 @@ export function CodeforcesActivityCard({ stats, handle }: CodeforcesActivityCard
                       fontFamily: "monospace",
                     }}
                     labelStyle={{ color: "#a1a1aa" }}
-                    itemStyle={{ color: "#10b981" }}
+                    itemStyle={{ color: "#06b6d4" }}
                     formatter={(value: any) => [`${value} pts`, "Rating"]}
                   />
                   <Line

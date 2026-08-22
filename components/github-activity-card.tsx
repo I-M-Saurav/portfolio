@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { GitHubStats } from "@/types/activity";
 import { Github, GitPullRequest, Users, FolderGit2, ArrowUpRight } from "lucide-react";
+import { ActivityHeatmap } from "./activity-heatmap";
 
 interface GitHubActivityCardProps {
   stats: GitHubStats | null;
@@ -10,11 +11,9 @@ interface GitHubActivityCardProps {
 }
 
 export function GitHubActivityCard({ stats, username }: GitHubActivityCardProps) {
-  const [hoveredDay, setHoveredDay] = useState<{ date: string; count: number } | null>(null);
-
   if (!username) {
     return (
-      <div className="rounded-xl border border-black/10 dark:border-white/10 bg-white/70 dark:bg-[#111116]/80 p-6 flex flex-col items-center justify-center text-center space-y-3 min-h-[300px] shadow-md">
+      <div className="rounded-xl border border-black/10 dark:border-white/10 bg-white/70 dark:bg-[#111116]/80 p-6 flex flex-col items-center justify-center text-center space-y-3 min-h-[360px] shadow-md">
         <div className="w-12 h-12 rounded-full bg-black/5 dark:bg-white/5 flex items-center justify-center text-zinc-400">
           <Github className="w-6 h-6" />
         </div>
@@ -32,7 +31,7 @@ export function GitHubActivityCard({ stats, username }: GitHubActivityCardProps)
 
   if (!stats) {
     return (
-      <div className="rounded-xl border border-black/10 dark:border-white/10 bg-white/70 dark:bg-[#111116]/80 p-6 flex flex-col items-center justify-center text-center space-y-3 min-h-[300px] shadow-md">
+      <div className="rounded-xl border border-black/10 dark:border-white/10 bg-white/70 dark:bg-[#111116]/80 p-6 flex flex-col items-center justify-center text-center space-y-3 min-h-[360px] shadow-md">
         <div className="w-12 h-12 rounded-full bg-black/5 dark:bg-white/5 flex items-center justify-center text-zinc-400">
           <Github className="w-6 h-6" />
         </div>
@@ -47,15 +46,6 @@ export function GitHubActivityCard({ stats, username }: GitHubActivityCardProps)
       </div>
     );
   }
-
-  // Calculate intensity color level based on contribution count
-  const getCellColor = (count: number) => {
-    if (count === 0) return "bg-zinc-200 dark:bg-zinc-800/60";
-    if (count <= 2) return "bg-emerald-500/30";
-    if (count <= 5) return "bg-emerald-500/60";
-    if (count <= 9) return "bg-emerald-500/80";
-    return "bg-emerald-400";
-  };
 
   return (
     <div className="rounded-xl border border-black/10 dark:border-white/10 bg-white/70 dark:bg-[#111116]/80 shadow-2xl backdrop-blur-md overflow-hidden flex flex-col justify-between">
@@ -119,58 +109,15 @@ export function GitHubActivityCard({ stats, username }: GitHubActivityCardProps)
           </div>
         </div>
 
-        {/* Contribution Heatmap Container */}
-        <div className="space-y-2.5">
-          <div className="flex items-center justify-between font-mono text-xs text-zinc-600 dark:text-zinc-400">
-            <div className="flex items-center gap-1.5">
-              <GitPullRequest className="w-3.5 h-3.5 text-emerald-500" />
-              <span className="font-semibold">
-                {stats.totalContributions.toLocaleString()} contributions
-              </span>
-              <span className="text-[11px] text-zinc-400">in the last year</span>
-            </div>
-            {hoveredDay && (
-              <div className="text-[11px] text-emerald-600 dark:text-emerald-400 animate-fade-in font-medium">
-                {hoveredDay.count} contribution{hoveredDay.count !== 1 ? "s" : ""} on {hoveredDay.date}
-              </div>
-            )}
-          </div>
-
-          {/* Heatmap Grid - 52 columns x 7 rows */}
-          <div className="overflow-x-auto pb-2 no-scrollbar">
-            <div className="inline-flex gap-[3px] min-w-full p-2 rounded-lg border border-black/10 dark:border-white/10 bg-black/[0.02] dark:bg-black/40">
-              {stats.weeks.map((week, wIdx) => (
-                <div key={wIdx} className="flex flex-col gap-[3px]">
-                  {week.contributionDays.map((day, dIdx) => (
-                    <div
-                      key={dIdx}
-                      onMouseEnter={() => setHoveredDay({ date: day.date, count: day.contributionCount })}
-                      onMouseLeave={() => setHoveredDay(null)}
-                      className={`w-[10px] h-[10px] rounded-[2px] transition-all hover:scale-125 cursor-pointer ${getCellColor(
-                        day.contributionCount
-                      )}`}
-                      title={`${day.contributionCount} contributions on ${day.date}`}
-                    />
-                  ))}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Heatmap Legend */}
-          <div className="flex items-center justify-between text-[10px] font-mono text-zinc-400 pt-1">
-            <span>52 weeks</span>
-            <div className="flex items-center gap-1.5">
-              <span>Less</span>
-              <div className="w-2.5 h-2.5 rounded-[2px] bg-zinc-200 dark:bg-zinc-800/60" />
-              <div className="w-2.5 h-2.5 rounded-[2px] bg-emerald-500/30" />
-              <div className="w-2.5 h-2.5 rounded-[2px] bg-emerald-500/60" />
-              <div className="w-2.5 h-2.5 rounded-[2px] bg-emerald-500/80" />
-              <div className="w-2.5 h-2.5 rounded-[2px] bg-emerald-400" />
-              <span>More</span>
-            </div>
-          </div>
-        </div>
+        {/* Contribution Heatmap */}
+        <ActivityHeatmap
+          weeks={stats.weeks}
+          totalCount={stats.totalContributions}
+          countLabel="contributions"
+          subLabel="in the last year"
+          icon={GitPullRequest}
+          theme="emerald"
+        />
       </div>
     </div>
   );
