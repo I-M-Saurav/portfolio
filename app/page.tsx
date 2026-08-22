@@ -98,9 +98,9 @@ export default async function HomePage() {
       </main>
 
       {/* Minimalistic Terminal Footer */}
-      <footer className="w-full border-t border-black/10 dark:border-white/10 py-8 px-6 md:px-12 text-center font-mono text-xs text-zinc-500 dark:text-zinc-500">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p>© {new Date().getFullYear()} {profile.name || "Portfolio"}. All rights reserved.</p>
+      <footer className="w-full border-t border-black/10 dark:border-white/10 py-6 sm:py-8 px-4 sm:px-6 md:px-8 lg:px-12 text-center font-mono text-xs text-zinc-500 dark:text-zinc-500">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+          <p className="text-center sm:text-left">© {new Date().getFullYear()} {profile.name || "Portfolio"}. All rights reserved.</p>
           <p className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse" />
             <span>sys_status: operational</span>

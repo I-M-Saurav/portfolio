@@ -45,18 +45,18 @@ export function ActivityHeatmap({
     theme === "cyan" ? "text-cyan-600 dark:text-cyan-400" : "text-emerald-600 dark:text-emerald-400";
 
   return (
-    <div className="space-y-2.5">
+    <div className="w-full max-w-full overflow-hidden space-y-2.5">
       {/* Top Count Bar */}
-      <div className="flex items-center justify-between font-mono text-xs text-zinc-600 dark:text-zinc-400">
-        <div className="flex items-center gap-1.5">
-          <Icon className={`w-3.5 h-3.5 ${activeColorText}`} />
+      <div className="flex flex-wrap items-center justify-between font-mono text-xs text-zinc-600 dark:text-zinc-400 gap-1">
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <Icon className={`w-3.5 h-3.5 ${activeColorText} shrink-0`} />
           <span className="font-semibold text-zinc-900 dark:text-zinc-100">
             {totalCount.toLocaleString()} {countLabel}
           </span>
-          <span className="text-[11px] text-zinc-400">{subLabel}</span>
+          <span className="text-[10px] sm:text-[11px] text-zinc-400">{subLabel}</span>
         </div>
         {hoveredDay && (
-          <div className={`text-[11px] font-medium animate-fade-in ${activeTooltipText}`}>
+          <div className={`text-[10px] sm:text-[11px] font-medium animate-fade-in ${activeTooltipText} truncate`}>
             {hoveredDay.count} {countLabel.replace(/s$/, "")}
             {hoveredDay.count !== 1 ? "s" : ""} on {hoveredDay.date}
           </div>
@@ -64,7 +64,7 @@ export function ActivityHeatmap({
       </div>
 
       {/* 52-Week Grid Container */}
-      <div className="overflow-x-auto pb-2 no-scrollbar">
+      <div className="overflow-x-auto pb-2 no-scrollbar touch-scroll">
         <div className="inline-flex gap-[3px] min-w-full p-2 rounded-lg border border-black/10 dark:border-white/10 bg-black/[0.02] dark:bg-black/40">
           {weeks.map((week, wIdx) => (
             <div key={wIdx} className="flex flex-col gap-[3px]">

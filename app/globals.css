@@ -17,6 +17,7 @@
 
   html {
     scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
   }
 
   body {
@@ -26,12 +27,14 @@
     min-height: 100vh;
     transition: background-color 0.25s ease, color 0.25s ease;
     overflow-x: hidden;
+    width: 100%;
   }
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
@@ -42,6 +45,20 @@
 }
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(120, 120, 120, 0.4);
+}
+
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Touch scrolling helper */
+.touch-scroll {
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Blinking cursor animation */
@@ -57,3 +74,4 @@
 .animate-cursor-blink {
   animation: blink 1s step-start infinite;
 }
+

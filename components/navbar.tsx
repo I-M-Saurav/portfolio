@@ -40,27 +40,27 @@ export function Navbar() {
   return (
     <header
       ref={navRef}
-      className="sticky top-0 z-40 w-full transition-colors duration-200 border-b border-black/10 dark:border-white/10 bg-white/60 dark:bg-black/40 backdrop-blur-md"
+      className="sticky top-0 z-40 w-full transition-colors duration-200 border-b border-black/10 dark:border-white/10 bg-white/70 dark:bg-[#0a0a0e]/80 backdrop-blur-md"
     >
-      <div className="max-w-7xl mx-auto px-6 md:px-12 h-16 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 h-16 flex items-center justify-between">
         {/* Left: Terminal Logo */}
         <Link
           href="/"
-          className="group flex items-center gap-1 font-mono text-sm sm:text-base font-semibold tracking-tight text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors focus:outline-none"
+          className="group flex items-center gap-1 font-mono text-xs sm:text-sm md:text-base font-semibold tracking-tight text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors focus:outline-none shrink-0"
           id="nav-logo"
         >
           <span className="text-zinc-400 dark:text-zinc-500 mr-0.5">$</span>
           <span>{siteContent.navLogo}</span>
-          <span className="inline-block w-2 h-4 bg-emerald-500 dark:bg-emerald-400 ml-1 animate-cursor-blink" />
+          <span className="inline-block w-2 h-3.5 sm:h-4 bg-emerald-500 dark:bg-emerald-400 ml-1 animate-cursor-blink" />
         </Link>
 
         {/* Center / Right: Desktop Navigation links */}
-        <nav className="hidden lg:flex items-center gap-4 xl:gap-6 text-xs xl:text-sm font-mono text-zinc-600 dark:text-zinc-400">
+        <nav className="hidden lg:flex items-center gap-2.5 xl:gap-5 text-xs xl:text-sm font-mono text-zinc-600 dark:text-zinc-400 whitespace-nowrap">
           {siteContent.navLinks.map((link) => (
             <a
               key={link.name}
               href={link.href}
-              className="transition-colors hover:text-emerald-600 dark:hover:text-emerald-400 py-1 font-medium"
+              className="transition-colors hover:text-emerald-600 dark:hover:text-emerald-400 py-1.5 px-1 font-medium"
             >
               {link.name}
             </a>
@@ -68,14 +68,14 @@ export function Navbar() {
         </nav>
 
         {/* Right side controls: Theme Toggle + Mobile Menu Trigger */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <ThemeToggle />
 
           {/* Mobile hamburger button */}
           <button
             type="button"
             onClick={() => setMobileMenuOpen((prev) => !prev)}
-            className="lg:hidden w-9 h-9 rounded-lg border border-black/10 dark:border-white/10 bg-white/40 dark:bg-white/5 hover:bg-black/5 dark:hover:bg-white/10 flex items-center justify-center text-zinc-700 dark:text-zinc-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 transition-colors"
+            className="lg:hidden w-10 h-10 min-w-[40px] min-h-[40px] rounded-lg border border-black/10 dark:border-white/10 bg-white/40 dark:bg-white/5 hover:bg-black/5 dark:hover:bg-white/10 flex items-center justify-center text-zinc-700 dark:text-zinc-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 transition-colors active:scale-95"
             aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
             aria-expanded={mobileMenuOpen}
             id="mobile-menu-toggle"
@@ -93,16 +93,16 @@ export function Navbar() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2, ease: "easeInOut" }}
-            className="lg:hidden border-t border-black/10 dark:border-white/10 bg-white/95 dark:bg-[#0e0e14]/95 backdrop-blur-xl shadow-xl overflow-hidden"
+            className="lg:hidden border-t border-black/10 dark:border-white/10 bg-white/95 dark:bg-[#0e0e14]/95 backdrop-blur-xl shadow-xl overflow-hidden max-h-[calc(100vh-4.5rem)] overflow-y-auto touch-scroll"
             id="mobile-nav-dropdown"
           >
-            <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col space-y-1">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col space-y-1">
               {siteContent.navLinks.map((link) => (
                 <a
                   key={link.name}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="px-4 py-3 rounded-lg font-mono text-sm text-zinc-700 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/15 transition-all duration-150 flex items-center justify-between"
+                  className="px-4 py-3 min-h-[44px] rounded-lg font-mono text-sm text-zinc-700 dark:text-zinc-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-500/10 dark:hover:bg-emerald-500/15 transition-all duration-150 flex items-center justify-between active:scale-[0.99]"
                 >
                   <span>{link.name}</span>
                   <span className="text-xs text-zinc-400 dark:text-zinc-600 font-mono">→</span>
