@@ -29,6 +29,7 @@ export interface ProfileDocument {
   twitterUrl?: string;
   contactMessage?: string;
   socialLinks?: SocialLink[];
+  coreTechnologies?: string[];
   quickFacts: QuickFact[];
   updatedAt?: Timestamp | Date | string;
 }

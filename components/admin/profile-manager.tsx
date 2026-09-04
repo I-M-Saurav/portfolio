@@ -21,6 +21,10 @@ import {
   Code2,
   FileText,
   ExternalLink,
+  ArrowUp,
+  ArrowDown,
+  Tag,
+  X,
 } from "lucide-react";
 
 export function ProfileManager() {
@@ -46,6 +50,7 @@ export function ProfileManager() {
   const [saving, setSaving] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [uploadingResume, setUploadingResume] = useState(false);
+  const [coreTechInput, setCoreTechInput] = useState("");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -211,6 +216,38 @@ export function ProfileManager() {
       const updated = [...prev.quickFacts];
       updated[index] = { ...updated[index], [field]: val };
       return { ...prev, quickFacts: updated };
+    });
+  };
+
+  // --- Core Technologies tag management ---
+  const addCoreTech = () => {
+    if (!coreTechInput.trim()) return;
+    const newTechs = coreTechInput
+      .split(",")
+      .map((t) => t.trim())
+      .filter((t) => t.length > 0 && !(profile.coreTechnologies || []).includes(t));
+    if (newTechs.length === 0) return;
+    setProfile((prev) => ({
+      ...prev,
+      coreTechnologies: [...(prev.coreTechnologies || []), ...newTechs],
+    }));
+    setCoreTechInput("");
+  };
+
+  const removeCoreTech = (index: number) => {
+    setProfile((prev) => ({
+      ...prev,
+      coreTechnologies: (prev.coreTechnologies || []).filter((_, i) => i !== index),
+    }));
+  };
+
+  const moveCoreTech = (index: number, direction: "up" | "down") => {
+    setProfile((prev) => {
+      const arr = [...(prev.coreTechnologies || [])];
+      const target = direction === "up" ? index - 1 : index + 1;
+      if (target < 0 || target >= arr.length) return prev;
+      [arr[index], arr[target]] = [arr[target], arr[index]];
+      return { ...prev, coreTechnologies: arr };
     });
   };
 
@@ -517,6 +554,98 @@ export function ProfileManager() {
             ))
           ) : (
             <div className="text-zinc-400 text-xs italic py-2">No quick facts added yet.</div>
+          )}
+        </div>
+      </div>
+
+      {/* Core Technologies Tag Editor */}
+      <div className="p-5 rounded-xl border border-black/10 dark:border-white/10 bg-white/40 dark:bg-zinc-950/40 space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <span className="font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
+              <Tag className="w-4 h-4 text-emerald-500" />
+              <span>Core Technologies (Hero Tags)</span>
+            </span>
+            <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">
+              Displayed as tags in the hero &ldquo;Core Technologies&rdquo; bar. Comma-separated or press Add.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <div className="relative flex-grow">
+            <Tag className="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              value={coreTechInput}
+              onChange={(e) => setCoreTechInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  addCoreTech();
+                }
+              }}
+              placeholder="e.g. TypeScript, React / Next.js, Docker"
+              className="w-full pl-9 pr-3 py-2.5 rounded-lg border border-black/10 dark:border-white/10 bg-white/50 dark:bg-zinc-950/50 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={addCoreTech}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 font-semibold cursor-pointer shrink-0"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Add</span>
+          </button>
+        </div>
+
+        <div className="space-y-1.5 pt-1">
+          {profile.coreTechnologies && profile.coreTechnologies.length > 0 ? (
+            profile.coreTechnologies.map((tech, idx) => (
+              <div
+                key={idx}
+                className="flex items-center gap-2 group px-3 py-2 rounded-lg border border-black/5 dark:border-white/5 bg-white/30 dark:bg-zinc-900/30 hover:border-emerald-500/20 transition-colors"
+              >
+                <span className="text-[11px] font-mono text-zinc-400 w-5 text-right shrink-0">
+                  {idx + 1}.
+                </span>
+                <span className="flex-grow text-xs text-zinc-800 dark:text-zinc-200 font-medium">
+                  {tech}
+                </span>
+                <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    type="button"
+                    onClick={() => moveCoreTech(idx, "up")}
+                    disabled={idx === 0}
+                    className="p-1 text-zinc-400 hover:text-emerald-500 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                    aria-label="Move up"
+                  >
+                    <ArrowUp className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => moveCoreTech(idx, "down")}
+                    disabled={idx === (profile.coreTechnologies?.length || 0) - 1}
+                    className="p-1 text-zinc-400 hover:text-emerald-500 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                    aria-label="Move down"
+                  >
+                    <ArrowDown className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => removeCoreTech(idx)}
+                    className="p-1 text-zinc-400 hover:text-red-500 transition-colors cursor-pointer"
+                    aria-label="Remove tag"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="text-zinc-400 text-xs italic py-2">
+              No core technologies added yet. Tags from lib/content.ts will be used as fallback.
+            </div>
           )}
         </div>
       </div>

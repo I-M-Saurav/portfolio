@@ -45,6 +45,10 @@ export function Hero({ initialProfile }: HeroProps) {
   const displayIdentity = profile.tagline || siteContent.identity;
   const displayBio = profile.bio || siteContent.bio;
   const displayStatus = siteContent.status;
+  const displayCoreTechnologies =
+    (profile.coreTechnologies && profile.coreTechnologies.length > 0)
+      ? profile.coreTechnologies
+      : siteContent.coreTechnologies;
 
   return (
     <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 pt-6 sm:pt-10 md:pt-16 pb-12 sm:pb-16 md:pb-20">
@@ -137,7 +141,7 @@ export function Hero({ initialProfile }: HeroProps) {
           CORE TECHNOLOGIES
         </h2>
         <div className="flex flex-wrap gap-2 sm:gap-2.5">
-          {siteContent.coreTechnologies.map((tech) => (
+          {displayCoreTechnologies.map((tech) => (
             <span
               key={tech}
               className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-mono border border-black/10 dark:border-white/10 bg-white/50 dark:bg-zinc-900/60 text-zinc-700 dark:text-zinc-300 hover:border-emerald-500/50 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all duration-150 shadow-sm"

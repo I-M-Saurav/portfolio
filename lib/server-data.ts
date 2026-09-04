@@ -32,6 +32,7 @@ const FALLBACK_PROFILE: ProfileDocument = {
     { platform: "Codeforces", url: "https://codeforces.com/profile/Knight_master" },
     { platform: "Twitter", url: "https://twitter.com" },
   ],
+  coreTechnologies: siteContent.coreTechnologies,
   quickFacts: [
     { key: "institution", value: "Indian Institute of Technology (IIT) Roorkee" },
     { key: "degree", value: "B.Tech in ECE" },
@@ -65,6 +66,7 @@ export async function getProfileServer(): Promise<ProfileDocument> {
         twitterUrl: data.twitterUrl || "",
         contactMessage: data.contactMessage || FALLBACK_PROFILE.contactMessage,
         socialLinks: Array.isArray(data.socialLinks) && data.socialLinks.length > 0 ? data.socialLinks : FALLBACK_PROFILE.socialLinks,
+        coreTechnologies: Array.isArray(data.coreTechnologies) && data.coreTechnologies.length > 0 ? data.coreTechnologies : FALLBACK_PROFILE.coreTechnologies,
         quickFacts: Array.isArray(data.quickFacts) && data.quickFacts.length > 0 ? data.quickFacts : FALLBACK_PROFILE.quickFacts,
         updatedAt: data.updatedAt?.toDate?.()?.toISOString() || data.updatedAt || "",
       };
